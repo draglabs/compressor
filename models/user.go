@@ -1,5 +1,6 @@
 package models
 
+//User struct
 type User struct {
 	ActiveJam  interface{} `json:"-" bson:"activeJam"`
 	ID         string      `json:"id" bson:"_id"`
@@ -9,6 +10,7 @@ type User struct {
 	JamDetails JamDetails  `json:"jam_details" bson:"jamDetails"`
 }
 
+// JamDetails struct
 type JamDetails struct {
 	ID        string `json:"id" bson:"id"`
 	Name      string `json:"name" bson:"name"`
@@ -16,6 +18,7 @@ type JamDetails struct {
 	EndTime   string `json:"end_time" bson:"endTime"`
 }
 
+// UserFB struct
 type UserFB struct {
 	FacebookID string `json:"facebook_id" bson:"facebook_id"`
 	Name       string `json:"name" bson:"name"`
