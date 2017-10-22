@@ -57,6 +57,8 @@ type Samplecharacteristics struct {
 type Outputs struct {
 	Groups []Group `xml:"group"`
 }
+
+//Group struct
 type Group struct {
 	Index       int64   `xml:"index"`
 	Numchannels int64   `xml:"numchannels"`
@@ -64,6 +66,7 @@ type Group struct {
 	Channel     Channel `xml:"channel"`
 }
 
+//Channel struct
 type Channel struct {
 	Index int64 `xml:"index"`
 }
@@ -75,6 +78,8 @@ type Track struct {
 	Clipitem           Clipitem `xml:"clipitem"`
 	Outputchannelindex int      `xml:"outputchannelindex"`
 }
+
+//Clipitem struct
 type Clipitem struct {
 	ID           string      `xml:"id,attr"`
 	Name         string      `xml:"name"`
@@ -88,6 +93,8 @@ type Clipitem struct {
 	Sourcetrack  Sourcetrack `xml:"sourcetrack"`
 	Channelcount int64       `xml:"channelcount"`
 }
+
+//File struct
 type File struct {
 	ID       string     `xml:"id,attr"`
 	Name     string     `xml:"name"`
@@ -96,15 +103,26 @@ type File struct {
 	Duration int64      `xml:"duration"`
 	Media    TrackMedia `xml:"media"`
 }
+
+//TrackMedia struct
 type TrackMedia struct {
 	Audio TrackAudio `xml:"audio"`
 }
+
+//TrackAudio struct
 type TrackAudio struct {
 	Samplecharacteristics Samplecharacteristics `xml:"samplecharacteristics"`
 }
+
+//Sourcetrack struct
 type Sourcetrack struct {
+	MediaType  string `xml:"mediatype"`
+	Trackindex int64  `xml:"trackindex"`
 }
 
 //TimeCode struct
 type TimeCode struct {
+	Rate          Rate   `xml:"rate"`
+	Frame         int64  `xml:"frame"`
+	Displayformat string `xml:"displayformat"`
 }
