@@ -12,7 +12,7 @@
           <ntsc>FALSE</ntsc>
         </rate>
         <name>40 seconds for DL clip_01.xml</name>  // JamName.xml
-        <media>
+        <media> // media
           <audio>
             <format>
               <samplecharacteristics>
