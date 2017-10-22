@@ -41,7 +41,7 @@
             <track>
               <enabled>TRUE</enabled>
               <locked>FALSE</locked>
-              <clipitem id="clipitem-0">                 // --------
+              <clipitem id="clipitem-0">                 // clipitem-iterated from zero as plus 1 for every track.
                 <name>TASCAM_0003 48000 1</name>         // contributer1 name
                 <enabled>TRUE</enabled>
                 <duration>985</duration>                 // duration in "Frames"
@@ -49,7 +49,7 @@
                 <end>992</end>                           // end time in "Frames"
                 <in>238</in>                             // Same as Start time
                 <out>1224</out>                          // Same as end time
-                <file id="0">                            // Zero for the first track ... 1 for the second
+                <file id="0">                            // Zero for the first track ++ thereafter (refer clipitem)
                   <name>TASCAM_0003 48000 1.wav</name>   // name of CAF file
                   <pathurl>/sources/name-of-audio-file.caf</pathurl>// name of path + CAF file
                   <rate>

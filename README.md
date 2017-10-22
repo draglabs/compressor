@@ -16,7 +16,7 @@ pass:  XefP9zEHiemj$
 Mailchimp API docs can be found here
 http://developer.mailchimp.com/documentation/mailchimp/reference/overview/
 
-**XML**
+**XML**  
 
 One key function for this program is to take in the time, comments and Jam Details then
 compile the data together into an xml format
@@ -31,3 +31,11 @@ This is why I pushed for using Julian Dates at the beginning.
 
 * [Sample XML](SampleXML.xml)`Sample XML File
 * [Sample XML](SampleTwoTrackXML.xml)`Sample XML with two examples
+
+**File Composition**
+
+This program should package a Zip file with one XML, and a subfolder containing all the source audio files. 
+
+**Compression options**
+
+At s
