@@ -27,6 +27,7 @@ in the xml everything is relitave thus date and time collected is more like a "n
 start time is relative to a "zero" and "zero" is relative to the Jam Start Time. 
 
 Lastly Time its self is in neither seconds or MS, it is in "Frames" there are 30 "frames" per second. 
+This is why I pushed for using Julian Dates at the beginning. 
 
-
-* [Sample XML](SampleXML.md)`Sample XML File
+* [Sample XML](SampleXML.xml)`Sample XML File
+* [Sample XML](SampleTwoTrackXML.xml)`Sample XML with two examples
