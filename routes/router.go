@@ -19,10 +19,18 @@ type responseMessage struct {
 func NewArchiveRouter() ArchiveRouter {
 	return ArchiveRouter{}
 }
+func middleware(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.URL)
+		w.Header().Set("Content-Type", "application/json")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (ar ArchiveRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
-
+		w.Header().Set("Content-Type", "application/json")
 		handleArchive(w, r)
 	default:
 		w.WriteHeader(http.StatusNotImplemented)

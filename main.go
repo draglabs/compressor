@@ -1,7 +1,9 @@
 package main
 
-import "net/http"
-import "compressor/routes"
+import (
+	"compressor/routes"
+	"net/http"
+)
 
 func main() {
 	handler := routes.NewArchiveRouter()
@@ -10,7 +12,3 @@ func main() {
 }
 
 var mux = http.NewServeMux()
-
-func parseParams(r *http.Request) {
-
-}
