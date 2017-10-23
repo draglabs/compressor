@@ -6,20 +6,28 @@ import (
 	"io"
 	"net/http"
 	"os"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 //FetchJam func, fetching a jam by
 // a given id
-func FetchJam(id string) (*models.Jam, error) {
+func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
 	var jam models.Jam
 	ds := db.NewDataStore()
 	defer ds.Close()
 	jc := ds.JamCollection()
-	err := jc.FindId(id).One(&jam)
-	if err != nil {
+	err := jc.Find(bson.M{"_id": bson.ObjectIdHex(params.JamID)}).One(&jam)
+
+	if err == nil {
 		return &jam, nil
 	}
+
 	return nil, err
+}
+
+func extractURL(jam models.Jam) {
+
 }
 
 // DownloadFile func, fetches the s3 url file and saves it to disk

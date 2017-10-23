@@ -8,10 +8,10 @@ import (
 
 const (
 	localHostDB = "mongodb://localhost:27017"
-	mlabHost    = "mongodb://draglabs:!2017Dlab@ds155737.mlab.com:55737/draglabsdev"
-	dbName      = "draglabs"
-	userC       = "user"
-	jamC        = "jam"
+	mlabHost    = "mongodb://archiver:!2017Dlab@ds155737.mlab.com:55737/draglabsdev"
+	dbName      = "draglabsdev"
+	userC       = "users"
+	jamC        = "jams"
 	//mongodb://marlon:4803marlon@ds035856.mlab.com:35856/draglabs
 )
 
@@ -45,6 +45,7 @@ func (ds *DataStore) Close() {
 
 // NewDataStore func, returns our new store
 func NewDataStore() *DataStore {
+
 	session, err := mgo.Dial(mlabHost)
 
 	if err != nil {

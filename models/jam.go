@@ -13,7 +13,7 @@ type Jam struct {
 	Location       string       `json:"location"        bson:"location"`
 	Creator        Creator      `json:"creator"         bson:"creator"`
 	StartTime      string       `json:"start_time"      bson:"startTime"`
-	EndTime        string       `json:"end_time"        bson:"startTime"`
+	EndTime        string       `json:"end_time"        bson:"endTime"`
 	StatusID       string       `json:"status_id"       bson:"statusID"`
 	Notes          string       `json:"notes"           bson:"notes"`
 }
