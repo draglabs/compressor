@@ -19,6 +19,26 @@ Mailchimp API docs can be found here
 * [Documentation for list usage for Mailchimp](http://developer.mailchimp.com/documentation/mailchimp/reference/lists/)
 * [Documentation for Authorization](http://developer.mailchimp.com/documentation/mailchimp/reference/authorized-apps/#)
 
+**Mailchimp API Key**
+Mandrill Api Key obtained from [https://mandrillapp.com/settings/](https://mandrillapp.com/settings/)
+
+* API KEY --  OMOxFhoklMo7hPjkmxUJxg
+
+Host smtp.mandrillapp.com
+Port 587
+SMTP Username Drag Labs
+SMTP Password any valid API key
+
+**Mailchimp API Key**
+Mandrill Api Key obtained from [https://mandrillapp.com/settings/](https://mandrillapp.com/settings/)
+
+* API KEY --  OMOxFhoklMo7hPjkmxUJxg
+
+Host smtp.mandrillapp.com
+Port 587
+SMTP Username Drag Labs
+SMTP Password any valid API key
+
 **XML**  
 
 One key function for this program is to take in the time, comments and Jam Details then
