@@ -53,7 +53,7 @@
                   <name>TASCAM_0003 48000 1.wav</name>   // name of CAF file
                   <pathurl>/sources/name-of-audio-file.caf</pathurl>// name of path + CAF file
                   <rate>
-                    <timebase>30</timebase>
+                    <timebase>30</timebase>              // how many frames there are per second
                     <ntsc>FALSE</ntsc>
                   </rate>
                   <duration>1224</duration>               // Time
