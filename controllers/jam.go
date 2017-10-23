@@ -34,18 +34,18 @@ func extractRecordings(jam models.Jam) {
 	}
 }
 func extractURL(rd models.Recordings) {
-	DownloadFile("temp", rd.S3url)
+	DownloadFile("temp", rd.S3url, rd.FileName)
 }
 
 // DownloadFile func, fetches the s3 url file and saves it to disk
-func DownloadFile(filepath string, url string) (err error) {
+func DownloadFile(filepath, url, name string) (err error) {
 
-	// Create the file
+	// Create the file if it doesnt exist
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
 		err := os.Mkdir(filepath, 0700)
-		fmt.Println(err)
+		return err
 	}
-	out, err := os.Create(filepath + "/audio" + ".caf")
+	out, err := os.Create(filepath + name + ".caf")
 	fmt.Print(err)
 	if err != nil {
 		return err

@@ -3,12 +3,15 @@ package main
 import (
 	"compressor/routes"
 	"net/http"
+	"os"
 )
+
+var port = os.Getenv("PORT")
 
 func main() {
 	handler := routes.NewArchiveRouter()
 	mux.Handle("/archive", handler)
-	http.ListenAndServe(":8080", mux)
+	http.ListenAndServe(port, mux)
 
 }
 
