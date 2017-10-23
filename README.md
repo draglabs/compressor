@@ -7,6 +7,8 @@ The program has access to mail chimp using the mailchimp api
 
 
 **Mailchimp API Key**
+*  [Mail Docs](ducumentation/email.md) /documentation/email
+
 0da37135e4b8e040ddc3b9c816beaeab-us15
 
 Mailchimp user account
@@ -19,7 +21,10 @@ Mailchimp API docs can be found here
 * [Documentation for list usage for Mailchimp](http://developer.mailchimp.com/documentation/mailchimp/reference/lists/)
 * [Documentation for Authorization](http://developer.mailchimp.com/documentation/mailchimp/reference/authorized-apps/#)
 
-**Mailchimp API Key**
+**Mandrill API Key**
+
+*  [Mail Docs](ducumentation/email.md) /documentation/email
+
 Mandrill Api Key obtained from [https://mandrillapp.com/settings/](https://mandrillapp.com/settings/)
 
 * API KEY --  OMOxFhoklMo7hPjkmxUJxg
@@ -29,7 +34,7 @@ Port 587
 SMTP Username Drag Labs
 SMTP Password any valid API key
 
-**Mailchimp API Key**
+**Mandrill API Key**
 Mandrill Api Key obtained from [https://mandrillapp.com/settings/](https://mandrillapp.com/settings/)
 
 * API KEY --  OMOxFhoklMo7hPjkmxUJxg
