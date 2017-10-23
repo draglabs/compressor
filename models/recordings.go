@@ -3,7 +3,7 @@ package models
 // Recordings struct
 type Recordings struct {
 	User      Creator `json:"user" bson:"user"`
-	FileName  string  `json:"file_name" bson:"file_name"`
+	FileName  string  `json:"file_name" bson:"fileName"`
 	JamID     string  `json:"jam_id" bson:"jamID"`
 	StartTime string  `json:"start_time" bson:"startTime"`
 	EndTime   string  `json:"end_time" bson:"endTime"`

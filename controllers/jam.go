@@ -3,6 +3,7 @@ package controllers
 import (
 	"compressor/db"
 	"compressor/models"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -20,21 +21,32 @@ func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
 	err := jc.Find(bson.M{"_id": bson.ObjectIdHex(params.JamID)}).One(&jam)
 
 	if err == nil {
+		extractRecordings(jam)
 		return &jam, nil
 	}
 
 	return nil, err
 }
 
-func extractURL(jam models.Jam) {
-
+func extractRecordings(jam models.Jam) {
+	for _, v := range jam.Recordings {
+		extractURL(v)
+	}
+}
+func extractURL(rd models.Recordings) {
+	DownloadFile("temp", rd.S3url)
 }
 
 // DownloadFile func, fetches the s3 url file and saves it to disk
 func DownloadFile(filepath string, url string) (err error) {
 
 	// Create the file
-	out, err := os.Create(filepath)
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
+		err := os.Mkdir(filepath, 0700)
+		fmt.Println(err)
+	}
+	out, err := os.Create(filepath + "/audio" + ".caf")
+	fmt.Print(err)
 	if err != nil {
 		return err
 	}
@@ -42,6 +54,7 @@ func DownloadFile(filepath string, url string) (err error) {
 
 	// Get the data
 	resp, err := http.Get(url)
+
 	if err != nil {
 		return err
 	}

@@ -6,7 +6,7 @@ type Jam struct {
 	Status bool   `json:"status" bson:"status"`
 	Name   string `json:"name"   bson:"name"`
 
-	CollaboartorID []string     `json:"collaborator_id" bson:"collaboratorID"`
+	CollaboartorID []string     `json:"collaborator_id" bson:"collaboartorID"`
 	Coordinates    []float64    `json:"coordinates"     bson:"coordinates"`
 	Collaborators  []Creator    `json:"collaborators"   bson:"collaborators"`
 	Recordings     []Recordings `json:"recordings"      bson:"recordings"`
