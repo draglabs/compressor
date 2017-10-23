@@ -1,29 +1,44 @@
 package mailer
 
 import (
+	"compressor/models"
 	"fmt"
 
 	"github.com/mattbaird/gochimp"
 )
 
-func SendMail() {
-	apiKey := "OMOxFhoklMo7hPjkmxUJxg"
+const (
+	jamName  = "jamName"
+	template = "simple"
+	apiKey   = "OMOxFhoklMo7hPjkmxUJxg"
+)
+
+func extractRecipients(jam models.Jam) []gochimp.Recipient {
+
+	var recepients []gochimp.Recipient
+	for _, r := range jam.Collaborators {
+
+		recepients = append(recepients, gochimp.Recipient{Email: r.Email})
+
+	}
+	if recepients != nil {
+		return recepients
+	}
+	return nil
+}
+
+//SendMail send a email to the user
+func SendMail(jam models.Jam) {
+
 	mandrillAPI, err := gochimp.NewMandrill(apiKey)
 
 	if err != nil {
 		fmt.Println("Error instantiating client")
 	}
 
-	templateName := "simple"
-	contentVar := gochimp.Var{Name: "jamName", Content: "testing from go"}
+	templateName := template
+	contentVar := gochimp.Var{Name: jamName, Content: jam.Name}
 	content := []gochimp.Var{contentVar}
-
-	//_, err = mandrillAPI.TemplateAdd(templateName, fmt.Sprintf("%s", contentVar.Content), true)
-	//if err != nil {
-	//fmt.Println("Error adding template")
-	//return
-	//}
-	//defer mandrillAPI.TemplateDelete(templateName)
 
 	renderedTemplate, err := mandrillAPI.TemplateRender(templateName, content, nil)
 
@@ -32,16 +47,13 @@ func SendMail() {
 		return
 	}
 
-	recipients := []gochimp.Recipient{
-		gochimp.Recipient{Email: "marlon@monroy.io"},
-		gochimp.Recipient{Email: "david.j.strom@gmail.com"},
-	}
+	recipients := extractRecipients(jam)
 
 	message := gochimp.Message{
 		Html:      renderedTemplate,
-		Subject:   "Texting from our mailer",
+		Subject:   "Jam audio files from dSoundboy",
 		FromEmail: "acounts@draglabs.com",
-		FromName:  "Drag Labs",
+		FromName:  "Drag Labs, dSoundboy",
 		To:        recipients,
 	}
 
