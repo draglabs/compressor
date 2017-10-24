@@ -19,6 +19,8 @@ type responseMessage struct {
 func NewArchiveRouter() ArchiveRouter {
 	return ArchiveRouter{}
 }
+
+// i need to put this middle ware before the interface method ServeHTTP
 func middleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(r.URL)
@@ -45,7 +47,10 @@ func handleArchive(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		er := json.NewEncoder(w).Encode(&jam)
 		fmt.Println(er)
+		// w.WriteHeader(http.StatusBadRequest)
+		// json.NewEncoder(w).Encode(responseMessage{"cant parse params"})
 	}
+
 }
 
 func parseParams(r *http.Request) *models.ArchiveParam {
@@ -60,8 +65,5 @@ func parseParams(r *http.Request) *models.ArchiveParam {
 
 // Index func, main index handler
 func Index(w http.ResponseWriter, r *http.Request) {
-	err := json.NewEncoder(w).Encode(responseMessage{"Compressor homepage"})
-	if err != nil {
-
-	}
+	json.NewEncoder(w).Encode(responseMessage{"Compressor homepage"})
 }

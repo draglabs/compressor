@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"compressor/archiver"
 	"compressor/db"
 	"compressor/models"
 	"fmt"
@@ -11,9 +12,13 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+var numOfFiles int
+var currentCount int
+
 //FetchJam func, fetching a jam by
 // a given id
 func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
+
 	var jam models.Jam
 	ds := db.NewDataStore()
 	defer ds.Close()
@@ -30,11 +35,14 @@ func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
 
 func extractRecordings(jam models.Jam) {
 	for _, v := range jam.Recordings {
+		numOfFiles++
 		extractURL(v)
 	}
+
 }
 func extractURL(rd models.Recordings) {
-	DownloadFile("temp", rd.S3url, rd.FileName)
+	err := DownloadFile("temp", rd.S3url, rd.FileName)
+	fmt.Println(err)
 }
 
 // DownloadFile func, fetches the s3 url file and saves it to disk
@@ -45,8 +53,8 @@ func DownloadFile(filepath, url, name string) (err error) {
 		err := os.Mkdir(filepath, 0700)
 		return err
 	}
-	out, err := os.Create(filepath + name + ".caf")
-	fmt.Print(err)
+	out, err := os.Create(filepath + "/" + name + ".caf")
+
 	if err != nil {
 		return err
 	}
@@ -65,6 +73,13 @@ func DownloadFile(filepath, url, name string) (err error) {
 	if err != nil {
 		return err
 	}
-
+	currentCount++
+	go archiveIfNeeded(currentCount)
 	return nil
+}
+func archiveIfNeeded(count int) {
+	if count == numOfFiles {
+		err := archiver.ZipArchive("temp", "archive.zip")
+		fmt.Println(err)
+	}
 }
