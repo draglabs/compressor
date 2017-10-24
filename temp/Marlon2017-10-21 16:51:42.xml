@@ -2,15 +2,15 @@
 <!DOCTYPE xmeml>
 <xmeml version="5">
    <project>
-      <name>Jam</name>
+      <name>Marlon2017-10-21 16:51:42</name>
       <children>
          <sequence id="sequence-1">
-            <duration>0</duration>
+            <duration>216000</duration>
             <rate>
                <timebase>0</timebase>
                <ntsc>false</ntsc>
             </rate>
-            <name></name>
+            <name>Marlon2017-10-21 16:51:42</name>
             <media>
                <audio>
                   <format>
@@ -24,11 +24,11 @@
             </media>
             <timecode>
                <rate>
-                  <timebase>0</timebase>
+                  <timebase>30</timebase>
                   <ntsc>false</ntsc>
                </rate>
                <frame>0</frame>
-               <displayformat></displayformat>
+               <displayformat>NDF</displayformat>
             </timecode>
          </sequence>
       </children>

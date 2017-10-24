@@ -14,6 +14,7 @@ import (
 
 var numOfFiles int
 var currentCount int
+var currentJam models.Jam
 
 //FetchJam func, fetching a jam by
 // a given id
@@ -26,7 +27,9 @@ func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
 	err := jc.Find(bson.M{"_id": bson.ObjectIdHex(params.JamID)}).One(&jam)
 
 	if err == nil {
+		currentJam = jam
 		extractRecordings(jam)
+
 		return &jam, nil
 	}
 
@@ -78,7 +81,7 @@ func DownloadFile(filepath, url, name string) (err error) {
 	return nil
 }
 func archiveIfNeeded(count int) {
-	GenerateXML()
+	GenerateXML(currentJam)
 	if count == numOfFiles {
 		err := archiver.ZipArchive("temp", "archive.zip")
 		fmt.Println(err)
