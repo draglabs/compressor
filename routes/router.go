@@ -57,3 +57,11 @@ func parseParams(r *http.Request) *models.ArchiveParam {
 	}
 	return nil
 }
+
+// Index func, main index handler
+func Index(w http.ResponseWriter, r *http.Request) {
+	err := json.NewEncoder(w).Encode(responseMessage{"Compressor homepage"})
+	if err != nil {
+
+	}
+}
