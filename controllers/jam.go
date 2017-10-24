@@ -78,6 +78,7 @@ func DownloadFile(filepath, url, name string) (err error) {
 	return nil
 }
 func archiveIfNeeded(count int) {
+	GenerateXML()
 	if count == numOfFiles {
 		err := archiver.ZipArchive("temp", "archive.zip")
 		fmt.Println(err)

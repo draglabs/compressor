@@ -3,8 +3,12 @@ package models
 import "encoding/xml"
 
 // Project struct holds the xml file
+type XML struct {
+	XMLName xml.Name `xml:"xmeml"`
+	V       string   `xml:"version,attr"`
+	Project Project  `xml:"project"`
+}
 type Project struct {
-	XMLName  xml.Name `xml:"project"`
 	Name     string   `xml:"name"`
 	Children Children `xml:"children"`
 }

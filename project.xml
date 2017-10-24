@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE xmeml>
+<xmeml version="5">
+   <project>
+      <name>Jam</name>
+      <children>
+         <sequence id="sequence-1">
+            <duration>0</duration>
+            <rate>
+               <timebase>0</timebase>
+               <ntsc>false</ntsc>
+            </rate>
+            <name></name>
+            <media>
+               <audio>
+                  <format>
+                     <samplecharacteristics>
+                        <depth>0</depth>
+                        <samplerate>0</samplerate>
+                     </samplecharacteristics>
+                  </format>
+                  <outputs></outputs>
+               </audio>
+            </media>
+            <timecode>
+               <rate>
+                  <timebase>0</timebase>
+                  <ntsc>false</ntsc>
+               </rate>
+               <frame>0</frame>
+               <displayformat></displayformat>
+            </timecode>
+         </sequence>
+      </children>
+   </project>
+</xmeml>
