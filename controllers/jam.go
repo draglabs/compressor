@@ -43,6 +43,7 @@ func extractRecordings(jam models.Jam) {
 	}
 
 }
+
 func extractURL(rd models.Recordings) {
 	err := DownloadFile("temp", rd.S3url, rd.FileName)
 	fmt.Println(err)

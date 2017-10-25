@@ -13,7 +13,6 @@ func main() {
 	mux.HandleFunc("/", routes.Index)
 	mux.Handle("/archive", handler)
 	log.Fatal(http.ListenAndServe(":8080", mux))
-
 }
 
 var mux = http.NewServeMux()
