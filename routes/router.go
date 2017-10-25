@@ -20,7 +20,7 @@ func NewArchiveRouter() ArchiveRouter {
 	return ArchiveRouter{}
 }
 
-// i need to put this middle ware before the interface method ServeHTTP
+// i need to put this middleware before the interface method ServeHTTP
 func middleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(r.URL)

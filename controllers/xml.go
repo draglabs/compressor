@@ -12,6 +12,8 @@ import (
 // Header is the header of the xml
 const Header = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>` + "\n"
 
+var logestDuration float64
+
 // HeaderDoc is the header doctype
 const HeaderDoc = `<!DOCTYPE xmeml>` + "\n"
 
@@ -90,7 +92,7 @@ func makeOutputs() models.Outputs {
 	}
 }
 func makeGroups(rds []models.Recordings) []models.Group {
-	var grounds []models.Group
+	var groups []models.Group
 	for i := 0; i < len(rds); i++ {
 		group := models.Group{
 			Index:       int64(i),
@@ -100,18 +102,19 @@ func makeGroups(rds []models.Recordings) []models.Group {
 				Index: int64(i),
 			},
 		}
-		grounds = append(grounds, group)
+		groups = append(groups, group)
 	}
-	return grounds
+	return groups
 }
 
 func makeTracks(rd []models.Recordings) []models.Track {
 	var tracks []models.Track
 	for i, r := range rd {
 		track := models.Track{
-			Enable:   true,
-			Locked:   false,
-			Clipitem: makeClipitem(r, i),
+			Enable:             true,
+			Locked:             false,
+			Clipitem:           makeClipitem(r, i),
+			Outputchannelindex: 25,
 		}
 		tracks = append(tracks, track)
 	}
@@ -124,17 +127,24 @@ func makeClipitem(rd models.Recordings, i int) models.Clipitem {
 		Name:     rd.User.Name,
 		Enabled:  true,
 		Duration: int64(convertTime(rd)) * 30,
+		Start:    int64(setStartTime(rd)) * 30,
+		End:      int64(setEndTime(rd)) * 30,
 	}
 }
+
+// calculateDuration func, should returns the logest
+// duration in frames
 func calculateDuration(r []models.Recordings) float64 {
 	return extractLongestDuration(r) * 30
 }
 
-func setStartTime(r models.Recordings) {
+func setStartTime(r models.Recordings) float64 {
+	offset := logestDuration - convertTime(r)
+	return offset
 	//MARK:TODO
 }
-func setEndTime(r models.Recordings) {
-
+func setEndTime(r models.Recordings) float64 {
+	return convertTime(r)
 }
 func extractLongestDuration(r []models.Recordings) float64 {
 	p := fmt.Println
@@ -145,6 +155,7 @@ func extractLongestDuration(r []models.Recordings) float64 {
 		}
 	}
 	p("longest", l)
+	logestDuration = l
 	return l
 }
 
@@ -173,10 +184,28 @@ func convertTime(r models.Recordings) float64 {
 	return math.Abs(duration)
 }
 
-func durationInFrames(d time.Duration) float64 {
+func durationInFrames(d float64) float64 {
 	return float64(timeToFrame(d))
 }
-func timeToFrame(t time.Duration) time.Duration {
+func timeToFrame(t float64) float64 {
 
-	return time.Duration(math.Abs(float64(t * 30)))
+	return (math.Abs(float64(t * 30)))
+}
+
+// sorting by duration
+//FUN FACT : the Big O is : log(n*n)
+// but i dont think will have more than 100
+func sortByLongDuration(rs []models.Recordings) []models.Recordings {
+	var sorted []models.Recordings
+	for i := 0; i < len(rs); i++ {
+		x := i
+		for j := i; j < len(rs); j++ {
+			if convertTime(rs[x]) > convertTime(rs[j]) {
+				x = j
+			}
+		}
+
+		sorted = append(sorted, rs[x])
+	}
+	return sorted
 }
