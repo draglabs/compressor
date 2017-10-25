@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"strconv"
 	"time"
 )
 
@@ -53,13 +54,13 @@ func makeSequence(jam models.Jam) models.Sequence {
 	return models.Sequence{
 		ID:       "sequence-1",
 		Duration: int64(calculateDuration(jam.Recordings)),
-		Rate:     makeSequeRate(),
+		Rate:     makeRate(),
 		Name:     jam.Name,
 		Media:    makeMedia(jam.Recordings),
 	}
 }
 
-func makeSequeRate() models.Rate {
+func makeRate() models.Rate {
 	return models.Rate{
 		TimeBase: 30,
 		Ntsc:     false,
@@ -123,12 +124,36 @@ func makeTracks(rd []models.Recordings) []models.Track {
 
 func makeClipitem(rd models.Recordings, i int) models.Clipitem {
 	return models.Clipitem{
-		ID:       "clipitem-" + string(i),
+		ID:       "clipitem-" + strconv.Itoa(i),
 		Name:     rd.User.Name,
 		Enabled:  true,
 		Duration: int64(convertTime(rd)) * 30,
 		Start:    int64(setStartTime(rd)) * 30,
 		End:      int64(setEndTime(rd)) * 30,
+		In:       int64(setStartTime(rd)) * 30,
+		Out:      int64(setEndTime(rd)) * 30,
+		File:     makeFile(rd, i),
+	}
+}
+func makeFile(r models.Recordings, i int) models.File {
+	return models.File{
+		ID:       strconv.Itoa(i),
+		Name:     r.FileName + ".caf",
+		Pathurl:  r.FileName + ".caf",
+		Rate:     makeRate(),
+		Duration: int64(convertTime(r)) * 30,
+		Media:    makeTrackMedia(),
+	}
+}
+func makeTrackMedia() models.TrackMedia {
+	return models.TrackMedia{Audio: makeTrackAudio()}
+}
+func makeTrackAudio() models.TrackAudio {
+	return models.TrackAudio{
+		Samplecharacteristics: models.Samplecharacteristics{
+			Depth:      32,
+			Samplerate: 12000,
+		},
 	}
 }
 

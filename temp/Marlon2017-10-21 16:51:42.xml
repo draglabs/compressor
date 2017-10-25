@@ -7,7 +7,7 @@
          <sequence id="sequence-1">
             <duration>216000</duration>
             <rate>
-               <timebase>0</timebase>
+               <timebase>30</timebase>
                <ntsc>false</ntsc>
             </rate>
             <name>Marlon2017-10-21 16:51:42</name>
@@ -15,20 +15,65 @@
                <audio>
                   <format>
                      <samplecharacteristics>
-                        <depth>0</depth>
-                        <samplerate>0</samplerate>
+                        <depth>32</depth>
+                        <samplerate>12000</samplerate>
                      </samplecharacteristics>
                   </format>
-                  <outputs></outputs>
+                  <outputs>
+                     <group>
+                        <index>0</index>
+                        <numchannels>1</numchannels>
+                        <downmix>0</downmix>
+                        <channel>
+                           <index>0</index>
+                        </channel>
+                     </group>
+                  </outputs>
+                  <track>
+                     <enable>true</enable>
+                     <locked>false</locked>
+                     <clipitem id="clipitem-0">
+                        <name>Marlon Monroy</name>
+                        <enabled>true</enabled>
+                        <duration>216000</duration>
+                        <start>0</start>
+                        <end>216000</end>
+                        <in>0</in>
+                        <out>216000</out>
+                        <file id="0">
+                           <name>MarlonMonroy.caf</name>
+                           <pathurl>MarlonMonroy.caf</pathurl>
+                           <rate>
+                              <timebase>30</timebase>
+                              <ntsc>false</ntsc>
+                           </rate>
+                           <duration>216000</duration>
+                           <media>
+                              <audio>
+                                 <samplecharacteristics>
+                                    <depth>32</depth>
+                                    <samplerate>12000</samplerate>
+                                 </samplecharacteristics>
+                              </audio>
+                           </media>
+                        </file>
+                        <sourcetrack>
+                           <mediatype></mediatype>
+                           <trackindex>0</trackindex>
+                        </sourcetrack>
+                        <channelcount>0</channelcount>
+                     </clipitem>
+                     <outputchannelindex>25</outputchannelindex>
+                  </track>
                </audio>
             </media>
             <timecode>
                <rate>
-                  <timebase>30</timebase>
+                  <timebase>0</timebase>
                   <ntsc>false</ntsc>
                </rate>
                <frame>0</frame>
-               <displayformat>NDF</displayformat>
+               <displayformat></displayformat>
             </timecode>
          </sequence>
       </children>
