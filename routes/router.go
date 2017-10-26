@@ -30,17 +30,17 @@ func middleware(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func (ar ArchiveRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// switch r.Method {
-	// case "POST":
-	w.Header().Set("Content-Type", "application/json")
-	handleArchive(w, r)
-	fmt.Println(r.Method)
-	// default:
-	// 	w.WriteHeader(http.StatusNotImplemented)
-	// 	w.Write([]byte("method not implemented"))
+	switch r.Method {
+	case "POST":
+		w.Header().Set("Content-Type", "application/json")
+		handleArchive(w, r)
 
-	// 	return
-	// }
+	default:
+		w.WriteHeader(http.StatusNotImplemented)
+		w.Write([]byte("method not implemented"))
+
+		return
+	}
 }
 func handleArchive(w http.ResponseWriter, r *http.Request) {
 	jam, err := controllers.FetchJam(parseParams(r))
