@@ -2,6 +2,7 @@ package main
 
 import (
 	"compressor/routes"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -13,6 +14,7 @@ func main() {
 	mux.HandleFunc("/", routes.Index)
 	mux.Handle("/archive", handler)
 	log.Fatal(http.ListenAndServe(":8081", mux))
+	fmt.Println("running on")
 }
 
 var mux = http.NewServeMux()
