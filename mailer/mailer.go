@@ -8,7 +8,11 @@ import (
 )
 
 const (
-	jamName  = "jamName"
+	jamName    = "jam_name"
+	jamNotes   = "jam_notes"
+	jamCreator = "jam_creator"
+	s3URL      = "s3_url"
+
 	template = "simple"
 	apiKey   = "OMOxFhoklMo7hPjkmxUJxg"
 )
@@ -23,12 +27,8 @@ func SendMail(jam models.Jam, s3url string) {
 	}
 
 	templateName := template
-	contentJamVar := gochimp.Var{Name: "jam_name", Content: jam.Name}
-	contentCreatorVar := gochimp.Var{Name: "creator", Content: jam.Creator.Name}
-	contentS3URLVar := gochimp.Var{Name: "s3_url", Content: s3url}
-	content := []gochimp.Var{contentJamVar, contentCreatorVar, contentS3URLVar}
 
-	renderedTemplate, err := mandrillAPI.TemplateRender(templateName, content, nil)
+	renderedTemplate, err := mandrillAPI.TemplateRender(templateName, composeContent(jam, s3url), nil)
 
 	if err != nil {
 		fmt.Println("Error rendering template")
@@ -37,13 +37,7 @@ func SendMail(jam models.Jam, s3url string) {
 
 	recipients := extractRecipients(jam)
 
-	message := gochimp.Message{
-		Html:      renderedTemplate,
-		Subject:   "Jam audio files from dSoundboy",
-		FromEmail: "acounts@draglabs.com",
-		FromName:  "Drag Labs, dSoundboy",
-		To:        recipients,
-	}
+	message := composeMessage(recipients, renderedTemplate)
 
 	_, err = mandrillAPI.MessageSend(message, false)
 
@@ -64,4 +58,21 @@ func extractRecipients(jam models.Jam) []gochimp.Recipient {
 		return recepients
 	}
 	return nil
+}
+func composeContent(jam models.Jam, url string) []gochimp.Var {
+	contentJamVar := gochimp.Var{Name: jamName, Content: jam.Name}
+	contentCreatorVar := gochimp.Var{Name: jamCreator, Content: jam.Creator.Name}
+	contentS3URLVar := gochimp.Var{Name: s3URL, Content: url}
+	contentJamNotes := gochimp.Var{Name: jamNotes, Content: jam.Notes}
+	content := []gochimp.Var{contentJamVar, contentCreatorVar, contentS3URLVar, contentJamNotes}
+	return content
+}
+func composeMessage(recipients []gochimp.Recipient, template string) gochimp.Message {
+	return gochimp.Message{
+		Html:      template,
+		Subject:   "Jam audio files from dSoundboy",
+		FromEmail: "acounts@draglabs.com",
+		FromName:  "Drag Labs, dSoundboy",
+		To:        recipients,
+	}
 }
