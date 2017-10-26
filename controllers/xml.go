@@ -57,6 +57,7 @@ func makeSequence(jam models.Jam) models.Sequence {
 		Rate:     makeRate(),
 		Name:     jam.Name,
 		Media:    makeMedia(jam.Recordings),
+		TimeCode: makeTimeCode(),
 	}
 }
 
@@ -71,6 +72,13 @@ func makeMedia(rs []models.Recordings) models.Media {
 	return models.Media{Audio: makeAudio(rs)}
 }
 
+func makeTimeCode() models.TimeCode {
+	return models.TimeCode{
+		Rate:          makeRate(),
+		Frame:         30,
+		Displayformat: "NDF",
+	}
+}
 func makeAudio(r []models.Recordings) models.Audio {
 	return models.Audio{
 		Format:  makeFormat(),
@@ -124,15 +132,17 @@ func makeTracks(rd []models.Recordings) []models.Track {
 
 func makeClipitem(rd models.Recordings, i int) models.Clipitem {
 	return models.Clipitem{
-		ID:       "clipitem-" + strconv.Itoa(i),
-		Name:     rd.User.Name,
-		Enabled:  true,
-		Duration: int64(convertTime(rd)) * 30,
-		Start:    int64(setStartTime(rd)) * 30,
-		End:      int64(setEndTime(rd)) * 30,
-		In:       int64(setStartTime(rd)) * 30,
-		Out:      int64(setEndTime(rd)) * 30,
-		File:     makeFile(rd, i),
+		ID:           "clipitem-" + strconv.Itoa(i),
+		Name:         rd.User.Name,
+		Enabled:      true,
+		Duration:     int64(convertTime(rd)) * 30,
+		Start:        int64(setStartTime(rd)) * 30,
+		End:          int64(setEndTime(rd)) * 30,
+		In:           int64(setStartTime(rd)) * 30,
+		Out:          int64(setEndTime(rd)) * 30,
+		File:         makeFile(rd, i),
+		Sourcetrack:  makeSourceTrack(rd, i),
+		Channelcount: int64(i),
 	}
 }
 func makeFile(r models.Recordings, i int) models.File {
@@ -156,6 +166,12 @@ func makeTrackAudio() models.TrackAudio {
 		},
 	}
 }
+func makeSourceTrack(r models.Recordings, i int) models.Sourcetrack {
+	return models.Sourcetrack{
+		MediaType:  "audio",
+		Trackindex: int64(i),
+	}
+}
 
 // calculateDuration func, should returns the logest
 // duration in frames
@@ -166,7 +182,6 @@ func calculateDuration(r []models.Recordings) float64 {
 func setStartTime(r models.Recordings) float64 {
 	offset := logestDuration - convertTime(r)
 	return offset
-	//MARK:TODO
 }
 func setEndTime(r models.Recordings) float64 {
 	return convertTime(r)
@@ -204,7 +219,10 @@ func isDurationLess(r models.Recordings) bool {
 func convertTime(r models.Recordings) float64 {
 	start, _ := time.Parse("2006-01-02T15:04:05", r.StartTime)
 	end, _ := time.Parse("2006-01-02T15:04:05", r.EndTime)
-
+	// duration since to be negative, and sure i know why
+	// instead of sub the start i shoudl sub the end.
+	// will come back and fix it
+	//find the
 	duration := start.Sub(end).Seconds()
 	return math.Abs(duration)
 }

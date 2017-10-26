@@ -4,6 +4,7 @@ import (
 	"compressor/archiver"
 	"compressor/db"
 	"compressor/models"
+	"compressor/uploader"
 	"fmt"
 	"io"
 	"net/http"
@@ -78,13 +79,15 @@ func DownloadFile(filepath, url, name string) (err error) {
 		return err
 	}
 	currentCount++
-	go archiveIfNeeded(currentCount)
+	archiveIfNeeded(currentCount)
 	return nil
 }
 func archiveIfNeeded(count int) {
 	GenerateXML(currentJam)
 	if count == numOfFiles {
-		err := archiver.ZipArchive("temp", "archive.zip")
-		fmt.Println(err)
+		if err := archiver.ZipArchive("temp", "archive.zip"); err == nil {
+			uploader.Upload("archive.zip", currentJam.Creator.ID)
+		}
+
 	}
 }

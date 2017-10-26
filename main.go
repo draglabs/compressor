@@ -14,7 +14,7 @@ func main() {
 	mux.HandleFunc("/", routes.Index)
 	mux.Handle("/archive", handler)
 	fmt.Println("running on")
-	log.Fatal(http.ListenAndServe(":8081", mux))
+	log.Fatal(http.ListenAndServe(":8080", mux))
 
 }
 

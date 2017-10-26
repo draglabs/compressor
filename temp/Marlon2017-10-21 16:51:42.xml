@@ -58,7 +58,7 @@
                            </media>
                         </file>
                         <sourcetrack>
-                           <mediatype></mediatype>
+                           <mediatype>audio</mediatype>
                            <trackindex>0</trackindex>
                         </sourcetrack>
                         <channelcount>0</channelcount>
@@ -69,11 +69,11 @@
             </media>
             <timecode>
                <rate>
-                  <timebase>0</timebase>
+                  <timebase>30</timebase>
                   <ntsc>false</ntsc>
                </rate>
-               <frame>0</frame>
-               <displayformat></displayformat>
+               <frame>30</frame>
+               <displayformat>NDF</displayformat>
             </timecode>
          </sequence>
       </children>
