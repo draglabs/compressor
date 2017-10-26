@@ -18,9 +18,7 @@ const (
 // it moves to call the mailer to send email to the user
 func Upload(filename string, id string) (string, error) {
 
-	// The session the S3 Uploader will use
-	sess := session.Must(session.NewSession())
-
+	sess, err := session.NewSession(&aws.Config{Region: aws.String(s3region)})
 	// Create an uploader with the session and default options
 	uploader := s3manager.NewUploader(sess)
 
@@ -33,7 +31,7 @@ func Upload(filename string, id string) (string, error) {
 	// Upload the file to S3.
 	result, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String("dsoundboy-export"),
-		Key:    aws.String(id),
+		Key:    aws.String(id + ".zip"),
 		Body:   f,
 	})
 	if err != nil {
