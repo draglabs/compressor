@@ -29,7 +29,7 @@ func GenerateXML(jam models.Jam) (*models.XML, error) {
 
 	xmlFile = []byte(Header + HeaderDoc + string(xmlFile))
 
-	err := ioutil.WriteFile("temp/"+jam.Name+".xml", xmlFile, 0644)
+	err := ioutil.WriteFile(jam.Name+"/"+jam.Name+".xml", xmlFile, 0644)
 	if err != nil {
 		return nil, err
 	}
@@ -217,8 +217,10 @@ func isDurationLess(r models.Recordings) bool {
 	return false
 }
 func convertTime(r models.Recordings) float64 {
-	start, _ := time.Parse("2006-01-02T15:04:05", r.StartTime)
-	end, _ := time.Parse("2006-01-02T15:04:05", r.EndTime)
+	//2006-01-02 15:04:05 -0700
+	//2006-01-02T15:04:05
+	start, _ := time.Parse("2006-01-02 15:04:05 -0700", r.StartTime)
+	end, _ := time.Parse("2006-01-02 15:04:05 -0700", r.EndTime)
 	// duration since to be negative, and sure i know why
 	// instead of sub the start i shoudl sub the end.
 	// will come back and fix it

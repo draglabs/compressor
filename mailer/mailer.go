@@ -13,22 +13,8 @@ const (
 	apiKey   = "OMOxFhoklMo7hPjkmxUJxg"
 )
 
-func extractRecipients(jam models.Jam) []gochimp.Recipient {
-
-	var recepients []gochimp.Recipient
-	for _, r := range jam.Collaborators {
-
-		recepients = append(recepients, gochimp.Recipient{Email: r.Email})
-
-	}
-	if recepients != nil {
-		return recepients
-	}
-	return nil
-}
-
 //SendMail send a email to the user
-func SendMail(jam models.Jam) {
+func SendMail(jam models.Jam, s3url string) {
 
 	mandrillAPI, err := gochimp.NewMandrill(apiKey)
 
@@ -37,8 +23,10 @@ func SendMail(jam models.Jam) {
 	}
 
 	templateName := template
-	contentVar := gochimp.Var{Name: jamName, Content: jam.Name}
-	content := []gochimp.Var{contentVar}
+	contentJamVar := gochimp.Var{Name: "jam_name", Content: jam.Name}
+	contentCreatorVar := gochimp.Var{Name: "creator", Content: jam.Creator.Name}
+	contentS3URLVar := gochimp.Var{Name: "s3_url", Content: s3url}
+	content := []gochimp.Var{contentJamVar, contentCreatorVar, contentS3URLVar}
 
 	renderedTemplate, err := mandrillAPI.TemplateRender(templateName, content, nil)
 
@@ -62,4 +50,18 @@ func SendMail(jam models.Jam) {
 	if err != nil {
 		fmt.Println("Error sending message")
 	}
+}
+
+func extractRecipients(jam models.Jam) []gochimp.Recipient {
+
+	var recepients []gochimp.Recipient
+	for _, r := range jam.Collaborators {
+
+		recepients = append(recepients, gochimp.Recipient{Email: r.Email})
+
+	}
+	if recepients != nil {
+		return recepients
+	}
+	return nil
 }

@@ -3,6 +3,7 @@ package controllers
 import (
 	"compressor/archiver"
 	"compressor/db"
+	"compressor/mailer"
 	"compressor/models"
 	"compressor/uploader"
 	"fmt"
@@ -13,8 +14,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var numOfFiles int
-var currentCount int
 var currentJam models.Jam
 
 //FetchJam func, fetching a jam by
@@ -38,25 +37,36 @@ func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
 }
 
 func extractRecordings(jam models.Jam) {
-	for _, v := range jam.Recordings {
-		numOfFiles++
-		extractURL(v)
-	}
+	extractURLAndDownload(jam.Recordings)
 
 }
 
-func extractURL(rd models.Recordings) {
-	err := DownloadFile("temp", rd.S3url, rd.FileName)
-	fmt.Println(err)
+func extractURLAndDownload(rd []models.Recordings) {
+	c := make(chan error)
+
+	for _, r := range rd {
+		go func(d models.Recordings) {
+			err := downloadFile(currentJam.Name, d.S3url, d.FileName)
+			c <- err
+		}(r)
+	}
+	for i := 0; i < len(rd); i++ {
+		err := <-c
+		if err == nil {
+			fmt.Println("no error downloading files")
+		}
+	}
+
+	archiveIfNeeded()
 }
 
 // DownloadFile func, fetches the s3 url file and saves it to disk
-func DownloadFile(filepath, url, name string) (err error) {
-
+func downloadFile(filepath, url, name string) error {
+	fmt.Println(url)
 	// Create the file if it doesnt exist
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		err := os.Mkdir(filepath, 0700)
-		return err
+		os.Mkdir(filepath, 0700)
+		//return err
 	}
 	out, err := os.Create(filepath + "/" + name + ".caf")
 
@@ -75,19 +85,26 @@ func DownloadFile(filepath, url, name string) (err error) {
 
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
+
 	if err != nil {
 		return err
 	}
-	currentCount++
-	archiveIfNeeded(currentCount)
+
 	return nil
 }
-func archiveIfNeeded(count int) {
-	GenerateXML(currentJam)
-	if count == numOfFiles {
-		if err := archiver.ZipArchive("temp", "archive.zip"); err == nil {
-			uploader.Upload("archive.zip", currentJam.Creator.ID)
-		}
-
+func archiveIfNeeded() error {
+	_, err := GenerateXML(currentJam)
+	if err != nil {
+		return err
 	}
+	if err := archiver.ZipArchive(currentJam.Name, "archive.zip"); err == nil {
+
+		url, err := uploader.Upload("archive.zip", currentJam.Creator.ID)
+		if err == nil {
+			mailer.SendMail(currentJam, url)
+			uploader.CleanupAfterUpload(currentJam.Name, "archive.zip")
+		}
+		return err
+	}
+	return nil
 }
