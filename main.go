@@ -13,8 +13,9 @@ func main() {
 	handler := routes.NewArchiveRouter()
 	mux.HandleFunc("/", routes.Index)
 	mux.Handle("/archive", handler)
-	log.Fatal(http.ListenAndServe(":8081", mux))
 	fmt.Println("running on")
+	log.Fatal(http.ListenAndServe(":8081", mux))
+
 }
 
 var mux = http.NewServeMux()
