@@ -17,8 +17,8 @@ func main() {
 	mux.HandleFunc("/", routes.Index)
 	mux.Handle("/archive", handler)
 	fmt.Println("running on")
-	if prod := os.Getenv("prod"); prod == "" {
-		port = ":8080"
+	if prod := os.Getenv("PROD"); prod == "" {
+		port = ":8081"
 	}
 	log.Fatal(http.ListenAndServe(port, mux))
 

@@ -16,6 +16,7 @@ type responseMessage struct {
 }
 
 // NewArchiveRouter func
+// represents the single router we have
 func NewArchiveRouter() ArchiveRouter {
 	return ArchiveRouter{}
 }
@@ -29,6 +30,7 @@ func middleware(next http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
+// ServeHTTP func, is the interface conformance
 func (ar ArchiveRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
@@ -42,6 +44,10 @@ func (ar ArchiveRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+// handleArchive func, is the handler for the
+// archive route, it fetches the jam by a given id
+// and sends it back to the user
 func handleArchive(w http.ResponseWriter, r *http.Request) {
 	jam, err := controllers.FetchJam(parseParams(r))
 
@@ -54,6 +60,8 @@ func handleArchive(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// parseParams func, parses the params of the incoming
+// request and checks for simple validation
 func parseParams(r *http.Request) *models.ArchiveParam {
 
 	userID := r.FormValue("user_id")
@@ -65,6 +73,9 @@ func parseParams(r *http.Request) *models.ArchiveParam {
 }
 
 // Index func, main index handler
+// handles the main entry point
+// by default it sends a message in json
+// to tell the user she/he as riched the index
 func Index(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(responseMessage{"Compressor homepage"})
 }
