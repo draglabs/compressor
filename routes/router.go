@@ -64,6 +64,7 @@ func handleArchive(w http.ResponseWriter, r *http.Request) {
 // request and checks for simple validation
 func parseParams(r *http.Request) *models.ArchiveParam {
 	var para models.ArchiveParam
+	r.ParseForm()
 	userID := r.FormValue("user_id")
 	jamID := r.FormValue("jam_id")
 	if userID != "" && jamID != "" {
