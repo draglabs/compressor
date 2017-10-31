@@ -53,9 +53,10 @@ func handleArchive(w http.ResponseWriter, r *http.Request) {
 
 	if err == nil {
 		er := json.NewEncoder(w).Encode(&jam)
-		fmt.Println(er)
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(responseMessage{"something when wrong: " + er.Error()})
+		if er != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(responseMessage{"something when wrong: " + er.Error()})
+		}
 	}
 
 }
