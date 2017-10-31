@@ -63,17 +63,11 @@ func handleArchive(w http.ResponseWriter, r *http.Request) {
 // parseParams func, parses the params of the incoming
 // request and checks for simple validation
 func parseParams(r *http.Request) *models.ArchiveParam {
-	var para models.ArchiveParam
 	r.ParseForm()
 	userID := r.FormValue("user_id")
 	jamID := r.FormValue("jam_id")
 	if userID != "" && jamID != "" {
 		return &models.ArchiveParam{UserID: userID, JamID: jamID}
-	}
-	err := json.NewDecoder(r.Body).Decode(&para)
-	defer r.Body.Close()
-	if err == nil {
-		return &para
 	}
 
 	return nil
