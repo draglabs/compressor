@@ -130,7 +130,9 @@ Send json data to MailChimp contain these specific fields:
         } 
 
     }
-    
+    `sudo vi /etc/nginx/sites-available/default` enginx default file
+    `sudo nginx -t` enginx test defaults
+    `sudo /etc/init.d/nginx reload` reload defaults
  Post Methods provided on Slack was originally designed to post a JSON object 
  containing contact info onto a list for MailChimp, however one can use the same sort
  method to send JSON objects with different information.
