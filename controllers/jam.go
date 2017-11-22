@@ -6,6 +6,7 @@ import (
 	"compressor/mailer"
 	"compressor/models"
 	"compressor/uploader"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,38 +29,35 @@ func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
 
 	if err == nil {
 		currentJam = jam
-		fetchRecordings(jam)
+		err = fetchRecordings(jam)
 
-		return &jam, nil
+		return &jam, err
 	}
 
 	return nil, err
 }
 
-func fetchRecordings(jam models.Jam) {
+func fetchRecordings(jam models.Jam) error {
 	var recordings []models.Recordings
 	ds := db.NewDataStore()
 	defer ds.Close()
 	err := ds.RecordingsCollection().Find(bson.M{"jam_id": jam.ID}).All(&recordings)
-	if err == nil {
-
+	if err == nil && len(recordings) > 0 {
 		currentJam.Recordings, _ = setUser(recordings)
 		extractURLAndDownload(recordings)
 	}
-
+	return errors.New("Not enough recordigns to process the zipping")
 }
 func setUser(rd []models.Recordings) ([]models.Recordings, error) {
 	var usr models.User
 	recordings := rd
 	ds := db.NewDataStore()
 	defer ds.Close()
-	err := ds.UserCollection().FindId(rd[1].UserID).One(&usr)
+	err := ds.UserCollection().FindId(rd[0].UserID).One(&usr)
 	if err != nil {
-		fmt.Println(err)
 		currentJam.Creator = usr
 		return recordings, err
 	}
-	fmt.Println(usr)
 	for _, r := range recordings {
 		r.User = usr
 	}
