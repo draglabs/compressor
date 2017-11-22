@@ -54,6 +54,7 @@ func extractRecipients(jam models.Jam) []gochimp.Recipient {
 		recepients = append(recepients, gochimp.Recipient{Email: r.Email})
 
 	}
+	recepients = append(recepients, gochimp.Recipient{Email: jam.Creator.FBEmail})
 	if recepients != nil {
 		return recepients
 	}
@@ -61,7 +62,7 @@ func extractRecipients(jam models.Jam) []gochimp.Recipient {
 }
 func composeContent(jam models.Jam, url string) []gochimp.Var {
 	contentJamVar := gochimp.Var{Name: jamName, Content: jam.Name}
-	contentCreatorVar := gochimp.Var{Name: jamCreator, Content: jam.Creator.Name}
+	contentCreatorVar := gochimp.Var{Name: jamCreator, Content: jam.Creator.FirstName}
 	contentS3URLVar := gochimp.Var{Name: s3URL, Content: url}
 	contentJamNotes := gochimp.Var{Name: jamNotes, Content: jam.Notes}
 	content := []gochimp.Var{contentJamVar, contentCreatorVar, contentS3URLVar, contentJamNotes}

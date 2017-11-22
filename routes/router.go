@@ -50,7 +50,6 @@ func (ar ArchiveRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // and sends it back to the user
 func handleArchive(w http.ResponseWriter, r *http.Request) {
 	jam, err := controllers.FetchJam(parseParams(r))
-
 	if err == nil {
 		er := json.NewEncoder(w).Encode(&jam)
 		if er != nil {
@@ -58,7 +57,6 @@ func handleArchive(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(responseMessage{"something when wrong: " + er.Error()})
 		}
 	}
-
 }
 
 // parseParams func, parses the params of the incoming

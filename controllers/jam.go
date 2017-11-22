@@ -24,11 +24,11 @@ func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
 	ds := db.NewDataStore()
 	defer ds.Close()
 	jc := ds.JamCollection()
-	err := jc.Find(bson.M{"_id": bson.ObjectIdHex(params.JamID)}).One(&jam)
+	err := jc.Find(bson.M{"_id": params.JamID}).One(&jam)
 
 	if err == nil {
 		currentJam = jam
-		extractRecordings(jam)
+		fetchRecordings(jam)
 
 		return &jam, nil
 	}
@@ -36,17 +36,42 @@ func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
 	return nil, err
 }
 
-func extractRecordings(jam models.Jam) {
-	extractURLAndDownload(jam.Recordings)
+func fetchRecordings(jam models.Jam) {
+	var recordings []models.Recordings
+	ds := db.NewDataStore()
+	defer ds.Close()
+	err := ds.RecordingsCollection().Find(bson.M{"jam_id": jam.ID}).All(&recordings)
+	if err == nil {
+
+		currentJam.Recordings, _ = setUser(recordings)
+		extractURLAndDownload(recordings)
+	}
 
 }
-
+func setUser(rd []models.Recordings) ([]models.Recordings, error) {
+	var usr models.User
+	recordings := rd
+	ds := db.NewDataStore()
+	defer ds.Close()
+	err := ds.UserCollection().FindId(rd[1].UserID).One(&usr)
+	if err != nil {
+		fmt.Println(err)
+		currentJam.Creator = usr
+		return recordings, err
+	}
+	fmt.Println(usr)
+	for _, r := range recordings {
+		r.User = usr
+	}
+	return recordings, nil
+}
 func extractURLAndDownload(rd []models.Recordings) {
 	c := make(chan error)
 
 	for _, r := range rd {
+
 		go func(d models.Recordings) {
-			err := downloadFile(currentJam.Name, d.S3url, d.FileName)
+			err := downloadFile(currentJam.ID, d.S3url, d.ID)
 			c <- err
 		}(r)
 	}
@@ -55,22 +80,24 @@ func extractURLAndDownload(rd []models.Recordings) {
 		if err == nil {
 			fmt.Println("no error downloading files")
 		}
-	}
 
+	}
 	archiveIfNeeded()
 }
 
 // DownloadFile func, fetches the s3 url file and saves it to disk
 func downloadFile(filepath, url, name string) error {
-	fmt.Println(url)
+
 	// Create the file if it doesnt exist
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
 		os.Mkdir(filepath, 0700)
+
 		//return err
 	}
 	out, err := os.Create(filepath + "/" + name + ".caf")
 
 	if err != nil {
+
 		return err
 	}
 	defer out.Close()
@@ -79,6 +106,7 @@ func downloadFile(filepath, url, name string) error {
 	resp, err := http.Get(url)
 
 	if err != nil {
+
 		return err
 	}
 	defer resp.Body.Close()
@@ -87,6 +115,7 @@ func downloadFile(filepath, url, name string) error {
 	_, err = io.Copy(out, resp.Body)
 
 	if err != nil {
+
 		return err
 	}
 
@@ -95,16 +124,20 @@ func downloadFile(filepath, url, name string) error {
 func archiveIfNeeded() error {
 	_, err := GenerateXML(currentJam)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
-	if err := archiver.ZipArchive(currentJam.Name, "archive.zip"); err == nil {
 
-		url, err := uploader.Upload("archive.zip", currentJam.Creator.ID)
+	if err := archiver.ZipArchive(currentJam.ID, "archive.zip"); err == nil {
+
+		url, err := uploader.Upload("archive.zip", currentJam.ID)
 		if err == nil {
 			mailer.SendMail(currentJam, url)
-			uploader.CleanupAfterUpload(currentJam.Name, "archive.zip")
+			uploader.CleanupAfterUpload(currentJam.ID, "archive.zip")
 		}
+
 		return err
 	}
+
 	return nil
 }

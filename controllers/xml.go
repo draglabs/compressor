@@ -29,7 +29,7 @@ func GenerateXML(jam models.Jam) (*models.XML, error) {
 
 	xmlFile = []byte(Header + HeaderDoc + string(xmlFile))
 
-	err := ioutil.WriteFile(jam.Name+"/"+jam.Name+".xml", xmlFile, 0644)
+	err := ioutil.WriteFile(jam.ID+"/"+jam.ID+".xml", xmlFile, 0644)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func makeTracks(rd []models.Recordings) []models.Track {
 func makeClipitem(rd models.Recordings, i int) models.Clipitem {
 	return models.Clipitem{
 		ID:           "clipitem-" + strconv.Itoa(i),
-		Name:         rd.User.Name,
+		Name:         rd.User.FirstName,
 		Enabled:      true,
 		Duration:     int64(convertTime(rd)) * 30,
 		Start:        int64(setStartTime(rd)) * 30,
@@ -148,8 +148,8 @@ func makeClipitem(rd models.Recordings, i int) models.Clipitem {
 func makeFile(r models.Recordings, i int) models.File {
 	return models.File{
 		ID:       strconv.Itoa(i),
-		Name:     r.FileName + ".caf",
-		Pathurl:  r.FileName + ".caf",
+		Name:     r.ID + ".caf",
+		Pathurl:  r.ID + ".caf",
 		Rate:     makeRate(),
 		Duration: int64(convertTime(r)) * 30,
 		Media:    makeTrackMedia(),
