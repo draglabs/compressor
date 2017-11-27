@@ -55,12 +55,15 @@ func setUser(rd []models.Recordings) ([]models.Recordings, error) {
 	defer ds.Close()
 	err := ds.UserCollection().FindId(rd[0].UserID).One(&usr)
 	if err != nil {
-		currentJam.Creator = usr
+
 		return recordings, err
 	}
 	for _, r := range recordings {
 		r.User = usr
 	}
+	currentJam.Creator = usr
+	fmt.Println("fb email from setuser: ", usr.FBEmail)
+	fmt.Println("creator email", currentJam.Creator.FBEmail)
 	return recordings, nil
 }
 func extractURLAndDownload(rd []models.Recordings) {

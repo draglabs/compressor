@@ -54,6 +54,7 @@ func extractRecipients(jam models.Jam) []gochimp.Recipient {
 		recepients = append(recepients, gochimp.Recipient{Email: r.Email})
 
 	}
+	fmt.Println("email", jam.Creator.FBEmail)
 	recepients = append(recepients, gochimp.Recipient{Email: jam.Creator.FBEmail})
 	if recepients != nil {
 		return recepients
