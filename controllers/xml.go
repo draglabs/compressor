@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"strconv"
 	"time"
 )
@@ -13,7 +12,8 @@ import (
 // Header is the header of the xml
 const Header = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>` + "\n"
 
-var logestDuration float64
+var duration float64       // in frames
+var currentEndTime float64 // in frames
 
 // HeaderDoc is the header doctype
 const HeaderDoc = `<!DOCTYPE xmeml>` + "\n"
@@ -24,13 +24,13 @@ func GenerateXML(jam models.Jam) (*models.XML, error) {
 		V:       "5",
 		Project: makeProject(jam),
 	}
-
 	xmlFile, _ := xml.MarshalIndent(xmlProject, "", `   `)
 
 	xmlFile = []byte(Header + HeaderDoc + string(xmlFile))
 
-	err := ioutil.WriteFile(jam.ID+"/"+jam.ID+".xml", xmlFile, 0644)
+	err := ioutil.WriteFile(jam.Name+"/"+jam.Name+".xml", xmlFile, 0644)
 	if err != nil {
+
 		return nil, err
 	}
 
@@ -51,9 +51,10 @@ func makeChildren(jam models.Jam) models.Children {
 }
 
 func makeSequence(jam models.Jam) models.Sequence {
+	duration = calculateDuration(jam.Recordings)
 	return models.Sequence{
 		ID:       "sequence-1",
-		Duration: int64(calculateDuration(jam.Recordings)),
+		Duration: int64(duration),
 		Rate:     makeRate(),
 		Name:     jam.Name,
 		Media:    makeMedia(jam.Recordings),
@@ -100,9 +101,10 @@ func makeOutputs() models.Outputs {
 		Groups: makeGroups(currentJam.Recordings),
 	}
 }
+
 func makeGroups(rds []models.Recordings) []models.Group {
 	var groups []models.Group
-	for i := 0; i < len(rds); i++ {
+	for i := 1; i < 3; i++ {
 		group := models.Group{
 			Index:       int64(i),
 			Downmix:     0,
@@ -119,6 +121,7 @@ func makeGroups(rds []models.Recordings) []models.Group {
 func makeTracks(rd []models.Recordings) []models.Track {
 	var tracks []models.Track
 	for i, r := range rd {
+
 		track := models.Track{
 			Enable:             true,
 			Locked:             false,
@@ -126,20 +129,29 @@ func makeTracks(rd []models.Recordings) []models.Track {
 			Outputchannelindex: 25,
 		}
 		tracks = append(tracks, track)
+		setCurrentEnd(r)
 	}
 	return tracks
 }
+func setCurrentEnd(r models.Recordings) {
+	if currentEndTime == duration {
+		return
+	}
+	if currentEndTime < duration {
+		currentEndTime += MakeDuration(r)
+	}
 
+}
 func makeClipitem(rd models.Recordings, i int) models.Clipitem {
 	return models.Clipitem{
 		ID:           "clipitem-" + strconv.Itoa(i),
-		Name:         rd.User.FirstName,
+		Name:         rd.ID + rd.User.FirstName,
 		Enabled:      true,
-		Duration:     int64(convertTime(rd)) * 30,
-		Start:        int64(setStartTime(rd)) * 30,
-		End:          int64(setEndTime(rd)) * 30,
-		In:           int64(setStartTime(rd)) * 30,
-		Out:          int64(setEndTime(rd)) * 30,
+		Duration:     int64(MakeDuration(rd)),
+		Start:        int64(currentEndTime),
+		End:          int64(currentEndTime + setEndTime(rd)),
+		In:           0,
+		Out:          int64(MakeDuration(rd)),
 		File:         makeFile(rd, i),
 		Sourcetrack:  makeSourceTrack(rd, i),
 		Channelcount: int64(i),
@@ -148,13 +160,14 @@ func makeClipitem(rd models.Recordings, i int) models.Clipitem {
 func makeFile(r models.Recordings, i int) models.File {
 	return models.File{
 		ID:       strconv.Itoa(i),
-		Name:     r.ID + ".caf",
-		Pathurl:  r.ID + ".caf",
+		Name:     r.User.FirstName + ".caf",
+		Pathurl:  r.StartTime + r.User.FirstName + ".caf",
 		Rate:     makeRate(),
-		Duration: int64(convertTime(r)) * 30,
+		Duration: int64((MakeDuration(r))),
 		Media:    makeTrackMedia(),
 	}
 }
+
 func makeTrackMedia() models.TrackMedia {
 	return models.TrackMedia{Audio: makeTrackAudio()}
 }
@@ -176,32 +189,27 @@ func makeSourceTrack(r models.Recordings, i int) models.Sourcetrack {
 // calculateDuration func, should returns the logest
 // duration in frames
 func calculateDuration(r []models.Recordings) float64 {
-	return extractLongestDuration(r) * 30
+	var l float64
+	for _, v := range r {
+		t := MakeDuration(v)
+		l += t
+	}
+	fmt.Println("Current Duration", l)
+	duration = l
+	return l * 30
 }
 
 func setStartTime(r models.Recordings) float64 {
-	offset := logestDuration - convertTime(r)
+	offset := duration - MakeDuration(r)
 	return offset
 }
 func setEndTime(r models.Recordings) float64 {
-	return convertTime(r)
-}
-func extractLongestDuration(r []models.Recordings) float64 {
-	p := fmt.Println
-	var l float64
-	for _, v := range r {
-		if t := convertTime(v); t > l {
-			l = t
-		}
-	}
-	p("longest", l)
-	logestDuration = l
-	return l
+	return MakeDuration(r)
 }
 
 func isDurationLonger(r models.Recordings) bool {
 	for _, cr := range currentJam.Recordings {
-		if convertTime(r) > convertTime(cr) {
+		if MakeDuration(r) > MakeDuration(cr) {
 			return true
 		}
 	}
@@ -210,31 +218,22 @@ func isDurationLonger(r models.Recordings) bool {
 
 func isDurationLess(r models.Recordings) bool {
 	for _, cr := range currentJam.Recordings {
-		if convertTime(r) < convertTime(cr) {
+		if MakeDuration(r) < MakeDuration(cr) {
 			return true
 		}
 	}
 	return false
 }
-func convertTime(r models.Recordings) float64 {
+
+// MakeDuration calculates the duration and
+// convert is to seconds
+func MakeDuration(r models.Recordings) float64 {
 	//2006-01-02 15:04:05 -0700
 	//2006-01-02T15:04:05
 	start, _ := time.Parse("2006-01-02 15:04:05 -0700", r.StartTime)
 	end, _ := time.Parse("2006-01-02 15:04:05 -0700", r.EndTime)
-	// duration since to be negative, and sure i know why
-	// instead of sub the start i shoudl sub the end.
-	// will come back and fix it
-	//find the
-	duration := start.Sub(end).Seconds()
-	return math.Abs(duration)
-}
-
-func durationInFrames(d float64) float64 {
-	return float64(timeToFrame(d))
-}
-func timeToFrame(t float64) float64 {
-
-	return (math.Abs(float64(t * 30)))
+	duration := end.Sub(start)
+	return duration.Seconds() * 30
 }
 
 // sorting by duration
@@ -245,7 +244,7 @@ func sortByLongDuration(rs []models.Recordings) []models.Recordings {
 	for i := 0; i < len(rs); i++ {
 		x := i
 		for j := i; j < len(rs); j++ {
-			if convertTime(rs[x]) > convertTime(rs[j]) {
+			if MakeDuration(rs[x]) > MakeDuration(rs[j]) {
 				x = j
 			}
 		}
@@ -253,4 +252,7 @@ func sortByLongDuration(rs []models.Recordings) []models.Recordings {
 		sorted = append(sorted, rs[x])
 	}
 	return sorted
+}
+func sortByStartTime(rs []models.Recordings) {
+
 }

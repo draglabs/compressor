@@ -3,7 +3,6 @@ package controllers
 import (
 	"compressor/archiver"
 	"compressor/db"
-	"compressor/mailer"
 	"compressor/models"
 	"compressor/uploader"
 	"errors"
@@ -29,6 +28,9 @@ func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
 
 	if err == nil {
 		currentJam = jam
+		var user models.User
+		err = ds.UserCollection().Find(bson.M{"_id": jam.UserID}).One(&user)
+		currentJam.Creator = user
 		err = fetchRecordings(jam)
 
 		return &jam, err
@@ -43,28 +45,29 @@ func fetchRecordings(jam models.Jam) error {
 	defer ds.Close()
 	err := ds.RecordingsCollection().Find(bson.M{"jam_id": jam.ID}).All(&recordings)
 	if err == nil && len(recordings) > 0 {
-		currentJam.Recordings, _ = setUser(recordings)
-		extractURLAndDownload(recordings)
+		setUser(recordings)
+
+		return err
 	}
+
 	return errors.New("Not enough recordigns to process the zipping")
 }
-func setUser(rd []models.Recordings) ([]models.Recordings, error) {
-	var usr models.User
-	recordings := rd
+
+func setUser(rd []models.Recordings) {
+	var recordings []models.Recordings
 	ds := db.NewDataStore()
 	defer ds.Close()
-	err := ds.UserCollection().FindId(rd[0].UserID).One(&usr)
-	if err != nil {
 
-		return recordings, err
-	}
-	for _, r := range recordings {
+	for _, r := range rd {
+		var usr models.User
+		err := ds.UserCollection().FindId(r.UserID).One(&usr)
 		r.User = usr
+		fmt.Println(err)
+		recordings = append(recordings, r)
 	}
-	currentJam.Creator = usr
-	fmt.Println("fb email from setuser: ", usr.FBEmail)
-	fmt.Println("creator email", currentJam.Creator.FBEmail)
-	return recordings, nil
+	currentJam.Recordings = recordings
+	extractURLAndDownload(recordings)
+
 }
 func extractURLAndDownload(rd []models.Recordings) {
 	c := make(chan error)
@@ -72,7 +75,7 @@ func extractURLAndDownload(rd []models.Recordings) {
 	for _, r := range rd {
 
 		go func(d models.Recordings) {
-			err := downloadFile(currentJam.ID, d.S3url, d.ID)
+			err := downloadFile(currentJam.Name, d.S3url, d.StartTime+d.User.FirstName)
 			c <- err
 		}(r)
 	}
@@ -125,16 +128,16 @@ func downloadFile(filepath, url, name string) error {
 func archiveIfNeeded() error {
 	_, err := GenerateXML(currentJam)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("error from gen", err)
 		return err
 	}
 
-	if err := archiver.ZipArchive(currentJam.ID, "archive.zip"); err == nil {
+	if err := archiver.ZipArchive(currentJam.Name, "archive.zip"); err == nil {
 
-		url, err := uploader.Upload("archive.zip", currentJam.ID)
+		_, err := uploader.Upload("archive.zip", currentJam.Name)
 		if err == nil {
-			mailer.SendMail(currentJam, url)
-			uploader.CleanupAfterUpload(currentJam.ID, "archive.zip")
+			//mailer.SendMail(currentJam, url)
+			//uploader.CleanupAfterUpload(currentJam.ID, "archive.zip")
 		}
 
 		return err
