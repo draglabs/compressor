@@ -3,6 +3,7 @@ package controllers
 import (
 	"compressor/archiver"
 	"compressor/db"
+	"compressor/mailer"
 	"compressor/models"
 	"compressor/uploader"
 	"errors"
@@ -134,10 +135,10 @@ func archiveIfNeeded() error {
 
 	if err := archiver.ZipArchive(currentJam.Name, "archive.zip"); err == nil {
 
-		_, err := uploader.Upload("archive.zip", currentJam.Name)
+		url, err := uploader.Upload("archive.zip", currentJam.Name)
 		if err == nil {
-			//mailer.SendMail(currentJam, url)
-			//uploader.CleanupAfterUpload(currentJam.ID, "archive.zip")
+			mailer.SendMail(currentJam, url)
+			uploader.CleanupAfterUpload(currentJam.ID, "archive.zip")
 		}
 
 		return err
