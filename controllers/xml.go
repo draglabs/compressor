@@ -52,6 +52,7 @@ func makeChildren(jam models.Jam) models.Children {
 
 func makeSequence(jam models.Jam) models.Sequence {
 	duration = calculateDuration(jam.Recordings)
+	//jam.Recordings = sortByUser(jam.Recordings)
 	return models.Sequence{
 		ID:       "sequence-1",
 		Duration: int64(duration),
@@ -80,6 +81,7 @@ func makeTimeCode() models.TimeCode {
 		Displayformat: "NDF",
 	}
 }
+
 func makeAudio(r []models.Recordings) models.Audio {
 	return models.Audio{
 		Format:  makeFormat(),
@@ -120,8 +122,12 @@ func makeGroups(rds []models.Recordings) []models.Group {
 
 func makeTracks(rd []models.Recordings) []models.Track {
 	var tracks []models.Track
+	currendID := rd[0].UserID
 	for i, r := range rd {
 
+		if currendID != r.UserID {
+			currentEndTime = 0
+		}
 		track := models.Track{
 			Enable:             true,
 			Locked:             false,
@@ -130,6 +136,7 @@ func makeTracks(rd []models.Recordings) []models.Track {
 		}
 		tracks = append(tracks, track)
 		setCurrentEnd(r)
+		currendID = r.UserID
 	}
 	return tracks
 }
@@ -140,7 +147,6 @@ func setCurrentEnd(r models.Recordings) {
 	if currentEndTime < duration {
 		currentEndTime += MakeDuration(r)
 	}
-
 }
 func makeClipitem(rd models.Recordings, i int) models.Clipitem {
 	return models.Clipitem{
@@ -236,19 +242,18 @@ func MakeDuration(r models.Recordings) float64 {
 	return duration.Seconds() * 30
 }
 
-// sorting by duration
+// sorting by User
 //FUN FACT : the Big O is : log(n*n)
 // but i dont think will have more than 100
-func sortByLongDuration(rs []models.Recordings) []models.Recordings {
+func sortByUser(rs []models.Recordings) []models.Recordings {
 	var sorted []models.Recordings
 	for i := 0; i < len(rs); i++ {
 		x := i
 		for j := i; j < len(rs); j++ {
-			if MakeDuration(rs[x]) > MakeDuration(rs[j]) {
+			if rs[x].UserID == rs[j].UserID {
 				x = j
 			}
 		}
-
 		sorted = append(sorted, rs[x])
 	}
 	return sorted
