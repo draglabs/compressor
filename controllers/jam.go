@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"compressor/archiver"
 	"compressor/db"
+	"compressor/mailer"
 	"compressor/models"
+	"compressor/uploader"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,43 +15,94 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+var currentJam models.Jam
+
 //FetchJam func, fetching a jam by
 // a given id
 func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
+
 	var jam models.Jam
 	ds := db.NewDataStore()
 	defer ds.Close()
 	jc := ds.JamCollection()
-	err := jc.Find(bson.M{"_id": bson.ObjectIdHex(params.JamID)}).One(&jam)
+	err := jc.Find(bson.M{"_id": params.JamID}).One(&jam)
 
 	if err == nil {
-		extractRecordings(jam)
-		return &jam, nil
+		currentJam = jam
+		var user models.User
+		err = ds.UserCollection().Find(bson.M{"_id": jam.UserID}).One(&user)
+		currentJam.Creator = user
+		err = fetchRecordings(jam)
+
+		return &jam, err
 	}
 
 	return nil, err
 }
 
-func extractRecordings(jam models.Jam) {
-	for _, v := range jam.Recordings {
-		extractURL(v)
+func fetchRecordings(jam models.Jam) error {
+	var recordings []models.Recordings
+	ds := db.NewDataStore()
+	defer ds.Close()
+	err := ds.RecordingsCollection().Find(bson.M{"jam_id": jam.ID}).All(&recordings)
+	if err == nil && len(recordings) > 0 {
+		setUser(recordings)
+
+		return err
 	}
+
+	return errors.New("Not enough recordigns to process the zipping")
 }
-func extractURL(rd models.Recordings) {
-	DownloadFile("temp", rd.S3url)
+
+func setUser(rd []models.Recordings) {
+	var recordings []models.Recordings
+	ds := db.NewDataStore()
+	defer ds.Close()
+
+	for _, r := range rd {
+		var usr models.User
+		err := ds.UserCollection().FindId(r.UserID).One(&usr)
+		r.User = usr
+		fmt.Println(err)
+		recordings = append(recordings, r)
+	}
+	currentJam.Recordings = recordings
+	extractURLAndDownload(recordings)
+
+}
+func extractURLAndDownload(rd []models.Recordings) {
+	c := make(chan error)
+
+	for _, r := range rd {
+
+		go func(d models.Recordings) {
+			err := downloadFile(currentJam.Name, d.S3url, d.StartTime+d.User.FirstName)
+			c <- err
+		}(r)
+	}
+	for i := 0; i < len(rd); i++ {
+		err := <-c
+		if err == nil {
+			fmt.Println("no error downloading files")
+		}
+
+	}
+	archiveIfNeeded()
 }
 
 // DownloadFile func, fetches the s3 url file and saves it to disk
-func DownloadFile(filepath string, url string) (err error) {
+func downloadFile(filepath, url, name string) error {
 
-	// Create the file
+	// Create the file if it doesnt exist
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		err := os.Mkdir(filepath, 0700)
-		fmt.Println(err)
+		os.Mkdir(filepath, 0700)
+
+		//return err
 	}
-	out, err := os.Create(filepath + "/audio" + ".caf")
-	fmt.Print(err)
+	out, err := os.Create(filepath + "/" + name + ".caf")
+
 	if err != nil {
+
 		return err
 	}
 	defer out.Close()
@@ -56,13 +111,36 @@ func DownloadFile(filepath string, url string) (err error) {
 	resp, err := http.Get(url)
 
 	if err != nil {
+
 		return err
 	}
 	defer resp.Body.Close()
 
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
+
 	if err != nil {
+
+		return err
+	}
+
+	return nil
+}
+func archiveIfNeeded() error {
+	_, err := GenerateXML(currentJam)
+	if err != nil {
+		fmt.Println("error from gen", err)
+		return err
+	}
+
+	if err := archiver.ZipArchive(currentJam.Name, "archive.zip"); err == nil {
+
+		url, err := uploader.Upload("archive.zip", currentJam.Name)
+		if err == nil {
+			mailer.SendMail(currentJam, url)
+			uploader.CleanupAfterUpload(currentJam.ID, "archive.zip")
+		}
+
 		return err
 	}
 

@@ -2,14 +2,24 @@ package main
 
 import (
 	"compressor/routes"
+	"fmt"
+	"log"
 	"net/http"
+	"os"
 )
 
+var port = os.Getenv("PORT")
+var mux = http.NewServeMux()
+var handler = routes.NewArchiveRouter()
+
 func main() {
-	handler := routes.NewArchiveRouter()
+
+	mux.HandleFunc("/", routes.Index)
 	mux.Handle("/archive", handler)
-	http.ListenAndServe(":8080", mux)
+	fmt.Println("running on")
+	if prod := os.Getenv("PROD"); prod == "" {
+		port = ":8081"
+	}
+	log.Fatal(http.ListenAndServe(port, mux))
 
 }
-
-var mux = http.NewServeMux()

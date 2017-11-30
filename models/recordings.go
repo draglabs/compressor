@@ -2,18 +2,13 @@ package models
 
 // Recordings struct
 type Recordings struct {
-	User      Creator `json:"user" bson:"user"`
-	FileName  string  `json:"file_name" bson:"fileName"`
-	JamID     string  `json:"jam_id" bson:"jamID"`
-	StartTime string  `json:"start_time" bson:"startTime"`
-	EndTime   string  `json:"end_time" bson:"endTime"`
-	Notes     string  `json:"notes" bson:"notes"`
-	S3url     string  `json:"s3url" bson:"s3url"`
-}
-
-//Creator struct
-type Creator struct {
-	ID    string `json:"id" bson:"id"`
-	Name  string `json:"name" bson:"name"`
-	Email string `json:"email" bson:"email"`
+	ID        string `json:"id" bson:"_id"`
+	UserID    string `json:"user_id" bson:"user_id"`
+	FileName  string `json:"file_name"   bson:"file_name"`
+	JamID     string `json:"jam_id"      bson:"jam_id"`
+	StartTime string `json:"start_time"  bson:"start_time"`
+	EndTime   string `json:"end_time"    bson:"end_time"`
+	Notes     string `json:"notes"       bson:"notes"`
+	S3url     string `json:"s3url"       bson:"s3url"`
+	User      User
 }
