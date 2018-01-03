@@ -126,6 +126,7 @@ func downloadFile(filepath, url, name string) error {
 
 	return nil
 }
+
 func archiveIfNeeded() error {
 	_, err := GenerateXML(currentJam)
 	if err != nil {
@@ -139,10 +140,19 @@ func archiveIfNeeded() error {
 		if err == nil {
 			mailer.SendMail(currentJam, url)
 			uploader.CleanupAfterUpload(currentJam.ID, "archive.zip")
+			addURL(url)
 		}
 
 		return err
 	}
 
 	return nil
+}
+
+// Add URL Link back to the jam
+func addURL(url string) error {
+	store := db.NewDataStore()
+	defer store.Close()
+	err := store.JamCollection().UpdateId(currentJam.ID, bson.M{"$set": bson.M{"link": url}})
+	return err
 }
