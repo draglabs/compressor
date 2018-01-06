@@ -94,12 +94,13 @@ func extractURLAndDownload(rd []models.Recordings) {
 func downloadFile(filepath, url, name string) error {
 
 	// Create the file if it doesnt exist
-	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		os.Mkdir(filepath, 0700)
+	tempPath := ".uploads/" + filepath
+	if _, err := os.Stat(tempPath); os.IsNotExist(err) {
+		os.Mkdir(tempPath, 0700)
 
 		//return err
 	}
-	out, err := os.Create(filepath + "/" + name + ".caf")
+	out, err := os.Create(tempPath + "/" + name + ".caf")
 
 	if err != nil {
 
@@ -130,10 +131,9 @@ func downloadFile(filepath, url, name string) error {
 func archiveIfNeeded() error {
 	_, err := GenerateXML(currentJam)
 	if err != nil {
-		fmt.Println("error from gen", err)
+		fmt.Println("error from generating", err)
 		return err
 	}
-
 	if err := archiver.ZipArchive(currentJam.Name, "archive.zip"); err == nil {
 
 		url, err := uploader.Upload("archive.zip", currentJam.Name)
