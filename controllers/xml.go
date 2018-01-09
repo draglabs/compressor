@@ -26,7 +26,7 @@ func GenerateXML(jam models.Jam) (*models.XML, error) {
 	xmlFile, _ := xml.MarshalIndent(xmlProject, "", `   `)
 
 	xmlFile = []byte(Header + HeaderDoc + string(xmlFile))
-
+	//0644
 	err := ioutil.WriteFile(".uploads/"+jam.Name+".xml", xmlFile, 0644)
 	if err != nil {
 
