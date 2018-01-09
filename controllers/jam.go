@@ -97,10 +97,9 @@ func downloadFile(filepath, url, name string) error {
 	tempPath := ".uploads"
 	if _, err := os.Stat(tempPath); os.IsNotExist(err) {
 		os.Mkdir(tempPath, 0700)
-		//return err
 	}
 	out, err := os.Create(tempPath + "/" + name + ".caf")
-
+	fmt.Println(out.Name())
 	if err != nil {
 
 		return err
@@ -138,7 +137,7 @@ func archiveIfNeeded() error {
 		url, err := uploader.Upload("archive.zip", currentJam.Name)
 		if err == nil {
 			mailer.SendMail(currentJam, url)
-			//	uploader.CleanupAfterUpload(".uploads", "archive.zip")
+			uploader.CleanupAfterUpload(".uploads", "archive.zip")
 			addURL(url)
 		}
 
