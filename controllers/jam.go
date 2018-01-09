@@ -137,7 +137,7 @@ func archiveIfNeeded() error {
 		url, err := uploader.Upload("archive.zip", currentJam.Name)
 		if err == nil {
 			mailer.SendMail(currentJam, url)
-			//uploader.CleanupAfterUpload("temp", "archive.zip")
+			uploader.CleanupAfterUpload("temp", "archive.zip")
 			addURL(url)
 		}
 
