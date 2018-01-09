@@ -94,7 +94,7 @@ func extractURLAndDownload(rd []models.Recordings) {
 func downloadFile(filepath, url, name string) error {
 
 	// Create the file if it doesnt exist
-	tempPath := ".uploads"
+	tempPath := "temp"
 	if _, err := os.Stat(tempPath); os.IsNotExist(err) {
 		os.Mkdir(tempPath, 0700)
 	}
@@ -132,12 +132,12 @@ func archiveIfNeeded() error {
 		fmt.Println("error from generating", err)
 		return err
 	}
-	if err := archiver.ZipArchive(".uploads/", "archive.zip"); err == nil {
+	if err := archiver.ZipArchive("temp", "archive.zip"); err == nil {
 
 		url, err := uploader.Upload("archive.zip", currentJam.Name)
 		if err == nil {
 			mailer.SendMail(currentJam, url)
-			uploader.CleanupAfterUpload(".uploads", "archive.zip")
+			uploader.CleanupAfterUpload("temp", "archive.zip")
 			addURL(url)
 		}
 
