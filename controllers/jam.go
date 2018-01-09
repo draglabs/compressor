@@ -132,7 +132,7 @@ func archiveIfNeeded() error {
 		fmt.Println("error from generating", err)
 		return err
 	}
-	if err := archiver.ZipArchive(".uploads", "archive.zip"); err == nil {
+	if err := archiver.ZipArchive(".uploads/", "archive.zip"); err == nil {
 
 		url, err := uploader.Upload("archive.zip", currentJam.Name)
 		if err == nil {
