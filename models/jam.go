@@ -15,4 +15,5 @@ type Jam struct {
 	EndTime       string       `json:"end_time"        bson:"end_time"`
 	Notes         string       `json:"notes"           bson:"notes"`
 	Creator       User
+	Link          string `json:"link"  bson:"link"`
 }

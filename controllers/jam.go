@@ -94,13 +94,12 @@ func extractURLAndDownload(rd []models.Recordings) {
 func downloadFile(filepath, url, name string) error {
 
 	// Create the file if it doesnt exist
-	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		os.Mkdir(filepath, 0700)
-
-		//return err
+	tempPath := "temp"
+	if _, err := os.Stat(tempPath); os.IsNotExist(err) {
+		os.Mkdir(tempPath, 0700)
 	}
-	out, err := os.Create(filepath + "/" + name + ".caf")
-
+	out, err := os.Create(tempPath + "/" + name + ".caf")
+	fmt.Println(out.Name())
 	if err != nil {
 
 		return err
@@ -126,23 +125,32 @@ func downloadFile(filepath, url, name string) error {
 
 	return nil
 }
+
 func archiveIfNeeded() error {
 	_, err := GenerateXML(currentJam)
 	if err != nil {
-		fmt.Println("error from gen", err)
+		fmt.Println("error from generating", err)
 		return err
 	}
-
-	if err := archiver.ZipArchive(currentJam.Name, "archive.zip"); err == nil {
+	if err := archiver.ZipArchive("temp", "archive.zip"); err == nil {
 
 		url, err := uploader.Upload("archive.zip", currentJam.Name)
 		if err == nil {
 			mailer.SendMail(currentJam, url)
-			uploader.CleanupAfterUpload(currentJam.ID, "archive.zip")
+			uploader.CleanupAfterUpload("temp", "archive.zip")
+			addURL(url)
 		}
 
 		return err
 	}
 
 	return nil
+}
+
+// Add URL Link back to the jam
+func addURL(url string) error {
+	store := db.NewDataStore()
+	defer store.Close()
+	err := store.JamCollection().UpdateId(currentJam.ID, bson.M{"$set": bson.M{"link": url}})
+	return err
 }
