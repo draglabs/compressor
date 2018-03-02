@@ -1,7 +1,7 @@
 package models
 
-// Recordings struct
-type Recordings struct {
+// Recording struct
+type Recording struct {
 	ID        string `json:"id" bson:"_id"`
 	UserID    string `json:"user_id" bson:"user_id"`
 	FileName  string `json:"file_name"   bson:"file_name"`

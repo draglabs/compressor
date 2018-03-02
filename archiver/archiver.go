@@ -8,7 +8,11 @@ import (
 	"strings"
 )
 
-//ZipArchive func, zippis our folder
+// Archives the folder where the files live into a zip file
+//
+// Params: source = the initial folder where the recordings live; target = the zip file that will contain the recordings
+//
+// Returns: error if something went wrong
 func ZipArchive(source, target string) error {
 	zipfile, err := os.Create(target)
 	if err != nil {
@@ -62,6 +66,7 @@ func ZipArchive(source, target string) error {
 		if err != nil {
 			return err
 		}
+
 		defer file.Close()
 		_, err = io.Copy(writer, file)
 		return err

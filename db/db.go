@@ -33,7 +33,7 @@ func (ds *DataStore) UserCollection() *mgo.Collection {
 }
 
 // JamCollection func, gives us a new jam collection
-// is a connvenience func  for `session.DB(dbName).C(cName)`
+// is a convenience func  for `session.DB(dbName).C(cName)`
 func (ds *DataStore) JamCollection() *mgo.Collection {
 
 	return ds.session.DB(dbName).C(jamC)

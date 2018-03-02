@@ -51,7 +51,7 @@ func makeChildren(jam models.Jam) models.Children {
 
 func makeSequence(jam models.Jam) models.Sequence {
 	duration = globalDuration()
-	//jam.Recordings = sortByUser(jam.Recordings)
+	//jam.Recording = sortByUser(jam.Recording)
 	return models.Sequence{
 		ID:       "sequence-1",
 		Duration: duration,
@@ -69,7 +69,7 @@ func makeRate() models.Rate {
 	}
 }
 
-func makeMedia(rs []models.Recordings) models.Media {
+func makeMedia(rs []models.Recording) models.Media {
 	return models.Media{Audio: makeAudio(rs)}
 }
 
@@ -81,7 +81,7 @@ func makeTimeCode() models.TimeCode {
 	}
 }
 
-func makeAudio(r []models.Recordings) models.Audio {
+func makeAudio(r []models.Recording) models.Audio {
 	return models.Audio{
 		Format:  makeFormat(),
 		Outputs: makeOutputs(),
@@ -103,7 +103,7 @@ func makeOutputs() models.Outputs {
 	}
 }
 
-func makeGroups(rds []models.Recordings) []models.Group {
+func makeGroups(rds []models.Recording) []models.Group {
 	var groups []models.Group
 	for i := 1; i < 3; i++ {
 		group := models.Group{
@@ -119,7 +119,7 @@ func makeGroups(rds []models.Recordings) []models.Group {
 	return groups
 }
 
-func makeTracks(rd []models.Recordings) []models.Track {
+func makeTracks(rd []models.Recording) []models.Track {
 	var tracks []models.Track
 
 	for i, r := range rd {
@@ -134,7 +134,7 @@ func makeTracks(rd []models.Recordings) []models.Track {
 	return tracks
 }
 
-func makeClipitem(rd models.Recordings, i int) models.Clipitem {
+func makeClipitem(rd models.Recording, i int) models.Clipitem {
 	return models.Clipitem{
 		ID:           "clipitem-" + strconv.Itoa(i),
 		Name:         rd.ID + rd.User.FirstName,
@@ -149,7 +149,7 @@ func makeClipitem(rd models.Recordings, i int) models.Clipitem {
 		Channelcount: int64(i),
 	}
 }
-func makeFile(r models.Recordings, i int) models.File {
+func makeFile(r models.Recording, i int) models.File {
 	return models.File{
 		ID:       strconv.Itoa(i),
 		Name:     r.User.FirstName + ".caf",
@@ -171,19 +171,19 @@ func makeTrackAudio() models.TrackAudio {
 		},
 	}
 }
-func makeSourceTrack(r models.Recordings, i int) models.Sourcetrack {
+func makeSourceTrack(r models.Recording, i int) models.Sourcetrack {
 	return models.Sourcetrack{
 		MediaType:  "audio",
 		Trackindex: int64(i),
 	}
 }
 
-func setStartTime(r models.Recordings) int64 {
+func setStartTime(r models.Recording) int64 {
 	offset := convertStartTime(r).Sub(zeroStart()).Seconds()
 	return int64(offset * 30)
 }
 
-func setEndTime(r models.Recordings) int64 {
+func setEndTime(r models.Recording) int64 {
 	start := globalDuration()
 	d := int64(MakeDuration(r))
 	return (start + d)
@@ -191,7 +191,7 @@ func setEndTime(r models.Recordings) int64 {
 
 // MakeDuration calculates the duration and
 // convert is to seconds
-func MakeDuration(r models.Recordings) float64 {
+func MakeDuration(r models.Recording) float64 {
 	//2006-01-02 15:04:05 -0700
 	//2006-01-02T15:04:05
 	start, _ := time.Parse("2006-01-02 15:04:05 -0700", r.StartTime)
@@ -210,7 +210,7 @@ func globalDuration() int64 {
 	d := end.Sub(start).Seconds()
 	return int64(d) * 30
 }
-func convertStartTime(r models.Recordings) time.Time {
+func convertStartTime(r models.Recording) time.Time {
 	start, _ := time.Parse("2006-01-02 15:04:05 -0700", r.StartTime)
 	return start
 }
@@ -218,8 +218,8 @@ func convertStartTime(r models.Recordings) time.Time {
 // sorting by User
 //FACT : the Big O is : log(n*n)
 // but i dont think will have more than 100
-func sortByUser(rs []models.Recordings) []models.Recordings {
-	var sorted []models.Recordings
+func sortByUser(rs []models.Recording) []models.Recording {
+	var sorted []models.Recording
 	for i := 0; i < len(rs); i++ {
 		x := i
 		for j := i; j < len(rs); j++ {
@@ -231,6 +231,6 @@ func sortByUser(rs []models.Recordings) []models.Recordings {
 	}
 	return sorted
 }
-func sortByStartTime(rs []models.Recordings) {
+func sortByStartTime(rs []models.Recording) {
 
 }
