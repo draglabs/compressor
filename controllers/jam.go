@@ -23,7 +23,7 @@ var currentJam models.Jam
 //
 // Returns: a jam model and and error; jam model is null if no jam was found with the ID given
 func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
-
+	fmt.Println("Running FetchJam; JamID: " + params.JamID + ", UserID: " + params.UserID)
 	var jam models.Jam
 	dataStore := db.NewDataStore()                                                          // contacts the database and retrieves an object representing it
 	defer dataStore.Close()                                                                 // closes the dataStore instance once the function returns
