@@ -19,6 +19,7 @@ func main() {
 	fmt.Println("running on")
 	if prod := os.Getenv("PROD"); prod == "" {
 		port = ":8081"
+		fmt.Println(port)
 	}
 	log.Fatal(http.ListenAndServe(port, mux))
 
