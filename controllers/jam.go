@@ -13,6 +13,7 @@ import (
 	"os"
 
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 var currentJam models.Jam
@@ -93,7 +94,8 @@ func extractURLAndDownload(rd []models.Recording) {
 
 	for _, recording := range rd {                                                          // creates a loop to go through each recording in the list of recordings
 		go func(rec models.Recording) {                                                     // launches a goroutine
-			err := downloadFile(currentJam.Name, rec.S3url, rec.StartTime+rec.User.FirstName) // initializes an error object for the downloader, gives each file a filename
+			formattedStartTime, _ := time.Parse(dateTimePattern, rec.StartTime)
+			err := downloadFile(currentJam.Name, rec.S3url, formattedStartTime.String()+rec.User.FirstName) // initializes an error object for the downloader, gives each file a filename
 			c <- err                                                                        // tells the channel that the download has been completed, and sends with it an error
 		} (recording)                                                                       // does something, maybe runs it?
 	}
