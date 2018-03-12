@@ -19,6 +19,7 @@ const (
 
 //SendMail send a email to the user
 func SendMail(jam models.Jam, s3url string) {
+	fmt.Println("Entering Function sendMail")
 
 	mandrillAPI, err := gochimp.NewMandrill(apiKey)
 
@@ -40,6 +41,7 @@ func SendMail(jam models.Jam, s3url string) {
 	message := composeMessage(recipients, renderedTemplate)
 
 	_, err = mandrillAPI.MessageSend(message, false)
+	fmt.Println("Email Sent")
 
 	if err != nil {
 		fmt.Println("Error sending message")

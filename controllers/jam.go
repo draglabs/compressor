@@ -49,6 +49,7 @@ func FetchJam(params *models.ArchiveParam) (*models.Jam, error) {
 //
 // Returns: an error if something went wrong
 func fetchRecordings(jam models.Jam) error {
+	fmt.Println("Entering Function fetchRecordings")
 	var recordings []models.Recording                                                       // an array of the Recording model, initialized
 	dataStore := db.NewDataStore()                                                          // calls the database for a new dataStore
 	defer dataStore.Close()                                                                 // closes the dataStore once the function returns
@@ -59,7 +60,8 @@ func fetchRecordings(jam models.Jam) error {
 		return err
 	}
 
-	return errors.New("Not enough recordings to process the zipping")
+	fmt.Println("Error: not enough recordings to process the zipping")
+	return errors.New("not enough recordings to process the zipping")
 }
 
 // Sets the user of the found jam to the one in the list of recordings
@@ -68,6 +70,7 @@ func fetchRecordings(jam models.Jam) error {
 //
 // Returns: nothing
 func setUser(rd []models.Recording) {
+	fmt.Println("Entering Function setUser")
 	var recordings []models.Recording                                                       // initializes the recordings object, a list of Recording models
 	dataStore := db.NewDataStore()                                                          // calls the database and retrieves and initializes a new dataStore
 	defer dataStore.Close()                                                                 // closes the dataStore once the function returns
@@ -89,6 +92,7 @@ func setUser(rd []models.Recording) {
 //
 // Returns: nothing
 func extractURLAndDownload(rd []models.Recording) {
+	fmt.Println("Entering Function extractURLAndDownload")
 	c := make(chan error)                                                                   // makes a communication channel for all threads so that the program doesn't crash before all have downloaded
 
 	for _, recording := range rd {                                                          // creates a loop to go through each recording in the list of recordings
@@ -114,6 +118,7 @@ func extractURLAndDownload(rd []models.Recording) {
 //
 // Returns: error if something goes wrong (read/write error, file not found)
 func downloadFile(filepath, url, name string) error {
+	fmt.Println("Entering Function downloadFile")
 
 	// Create the file if it doesn't exist
 	tempPath := "temp"
@@ -154,6 +159,8 @@ func downloadFile(filepath, url, name string) error {
 //
 // Returns: error if something went wrong
 func archiveIfNeeded() error {
+	fmt.Println("Entering Function archiveIfNeeded")
+
 	_, err := GenerateXML(currentJam)
 	if err != nil {
 		fmt.Println("error from generating", err)
@@ -181,6 +188,8 @@ func archiveIfNeeded() error {
 //
 // Returns: an error if something went wrong
 func addURL(url string) error {
+	fmt.Println("Entering Function addURL")
+
 	store := db.NewDataStore()
 	defer store.Close()
 	err := store.JamCollection().UpdateId(currentJam.ID, bson.M{"$set": bson.M{"link": url}})

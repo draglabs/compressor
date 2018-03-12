@@ -2,7 +2,7 @@ package models
 
 // Jam struct, models our Jam collection
 type Jam struct {
-	ID            string      `json:"id"             bson:"_id"`
+	ID            string      `json:"id"              bson:"_id"`
 	Pin           string      `json:"pin"             bson:"pin"`
 	IsCurrent     bool        `json:"is_current"      bson:"is_current"`
 	Name          string      `json:"name"            bson:"name"`
