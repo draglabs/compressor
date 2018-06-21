@@ -1,7 +1,8 @@
 package controllers
 
 import (
-	"compressor/models"
+	"github.com/draglabs/compressor/models"
+
 	"encoding/xml"
 	"io/ioutil"
 	"strconv"

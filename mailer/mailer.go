@@ -1,7 +1,7 @@
 package mailer
 
 import (
-	"compressor/models"
+	"github.com/draglabs/compressor/models"
 	"fmt"
 
 	"github.com/mattbaird/gochimp"
