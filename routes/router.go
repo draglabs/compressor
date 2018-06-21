@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"compressor/controllers"
-	"compressor/models"
+	"github.com/draglabs/compressor/controllers"
+	"github.com/draglabs/compressor/models"
+
 	"encoding/json"
 	"fmt"
 	"net/http"

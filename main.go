@@ -1,11 +1,14 @@
 package main
 
 import (
-	"compressor/routes"
+	"github.com/draglabs/compressor/routes"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+
+	"context"
+	"github.com/MindsightCo/go-mindsight-collector"
 )
 
 var port = os.Getenv("PORT")
@@ -14,6 +17,13 @@ var handler = routes.NewArchiveRouter()
 
 func main() {
 
+	// functions to start mindsight
+	ctx := context.Background()
+	collector.StartMindsightCollector(ctx,
+		collector.OptionAgentURL("http://localhost:8000/samples/"),
+		collector.OptionWatchPackage("github.com/draglabs/compressor/"))
+
+	// functions to start the server
 	mux.HandleFunc("/", routes.Index)
 	mux.Handle("/archive", handler)
 	fmt.Println("running on")

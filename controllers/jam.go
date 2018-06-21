@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"compressor/archiver"
-	"compressor/db"
-	"compressor/mailer"
-	"compressor/models"
-	"compressor/uploader"
+	"github.com/draglabs/compressor/archiver"
+	"github.com/draglabs/compressor/db"
+	"github.com/draglabs/compressor/mailer"
+	"github.com/draglabs/compressor/models"
+	"github.com/draglabs/compressor/uploader"
+
 	"errors"
 	"fmt"
 	"io"
